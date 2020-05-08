@@ -1,0 +1,13 @@
+# Ours
+model_save_directory: /home/native/projects/cranberry_counting/models/
+raw_images: /home/native/projects/data/cranberries/raw/images/
+labels: /home/native/projects/data/cranberries/cropped/jsons/
+cropped_no_label: /home/native/projects/data/cranberries/cropped/
+
+root_sep: /home/native/projects/data/cranberry_sep/
+root_combined: /home/native/projects/data/cranberry_combined/
+
+img_save_path: /home/native/projects/data/cranberries/cropped/images/
+label_save_path: /home/native/projects/data/cranberries/cropped/labels/
+height: 456
+width: 608

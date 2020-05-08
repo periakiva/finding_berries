@@ -1,0 +1,7 @@
+# Ours
+model_name: unet
+model_save_directory: /home/native/projects/cranberry_counting/models/unet/
+val_images: /home/native/projects/data/cranberries/raw/images/
+val_jsons: /home/native/projects/data/cranberries/raw/jsons/
+
+visalization_save_path: /home/native/projects/cranberry_counting/visualization_outputs/

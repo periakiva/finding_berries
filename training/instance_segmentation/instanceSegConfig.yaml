@@ -1,0 +1,30 @@
+# Ours
+data:
+  type: instace_seg
+  model_save_dir: /home/native/projects/data/cranberry/models/
+  train_dir: /home/native/projects/data/cranberry/instance_seg/
+  val_dir:
+  image_size: 456x608
+
+training: 
+  learning_rate: 0.004 #1e-4
+  resume: False
+  train_val_test_split: [0.8,0.1,0.1]
+  epochs: 300
+  batch_size: 4
+  drop_last_batch:
+  optimizer:
+  num_workers: 1
+
+use_cuda: True
+lambda:
+threads: 
+no_data_augm:
+val_freq:
+seed:
+log_interval:
+max_trainset_size:
+max_valset_size:
+max_mask_points: 
+radius:
+n_points:

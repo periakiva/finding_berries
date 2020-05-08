@@ -1,0 +1,53 @@
+# Ours
+data:
+  type: semantic_seg
+  model_save_dir: /home/native/projects/data/cranberry/models/
+  train_dir: /home/native/projects/data/cranberry/semantic_seg/
+  test_dir: 
+  val_dir:
+  image_size: 456x608
+
+training: 
+  learning_rate: 0.001 #1e-4
+  # resume: /home/native/projects/data/cranberry/models/floodfill/training_floodfill_instance_count_seg_0.2_instance_1.0_convexity_1.0_circularity_1.0_count_0.0_2020-02-27-18:55/floodfill_epoch_130_mean_iou_0.621876325903551_train_loss_19723.050176767203_time_2020-02-27-23:41:58.pth
+  resume: False
+  train_val_test_split: [0.8,0.1,0.1]
+  epochs: 200
+  batch_size: 1
+  drop_last_batch:
+  optimizer:
+  num_workers: 1
+  # loss_weights: {seg: 0.03, instance: 0.5, convexity: 100.0, circularity: 1.0, count: 1000.0}
+  loss_weights: {seg: 3.0, instance: 3.0, convexity: 10.0, circularity: 10.0, count: 0.2}
+  class_weights: {seg: [1,1,'mean'], instance: [60,1,'mean']}
+  # losses_to_use: ["count"]
+  # losses_to_use: ["insatnce"]
+  # losses_to_use: ["instance","count_detect"]
+  # losses_to_use: ["instance","count", "count_detect"]
+  # losses_to_use: ["instance","count", "count_regress"]
+  # losses_to_use: ["instance","circularity","count", "count_detect"]
+  # losses_to_use: ["instance","circularity", "count_detect"]
+  # losses_to_use: ["instance","circularity","count_detect"]
+  # losses_to_use: ["instance","convexity","count","count_detect"]
+  # losses_to_use: ["instance","convexity","count_detect"]
+  # losses_to_use: ["instance","circularity","convexity","count_detect"]
+  # losses_to_use: ["circularity","count"]
+  # losses_to_use: ["convexity","count"]
+  # losses_to_use: ["convexity"]
+  # losses_to_use: ["circularity","convexity","count"]
+  losses_to_use: ["count_detect"]
+  # test_with_full_supervision: 1
+  test_with_full_supervision: 0
+
+use_cuda: True
+lambda:
+threads: 
+no_data_augm:
+val_freq:
+seed:
+log_interval:
+max_trainset_size:
+max_valset_size:
+max_mask_points: 
+radius:
+n_points:

@@ -1,0 +1,17 @@
+# Ours
+model_save_dir: /data/cranberry_counting/models/
+# train_dir: /home/native/projects/data/cranberries/raw/images/
+train_dir: /data/cranberries/raw/images/
+# labels: /home/native/projects/data/cranberries/cropped/jsons/
+# cropped_no_label: /home/native/projects/data/cranberries/cropped/
+
+# img_save_path: /home/native/projects/data/cranberries/cropped/images/
+# label_save_path: /home/native/projects/data/cranberries/cropped/labels/
+
+learning_rate: 1e-4
+resume: False
+epochs: 300
+batch_size: 89
+use_cuda: True
+# loss_aggregation_size: 2
+# parallel_data_loader_count: 4
