@@ -2,10 +2,10 @@ import os
 import sys
 current_path = os.getcwd().split("/")
 if 'projects' in current_path:
-    sys.path.append("/home/native/projects/cranberry_counting/")
+    sys.path.append("/home/native/projects/finding_berries/")
     root_path = "/home/native/projects"
 else:
-    sys.path.append("/data/cranberry_counting/")
+    sys.path.append("/data/finding_berries/")
     root_path = ""
 import random
 
