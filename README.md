@@ -1,6 +1,6 @@
 # Finding Berries: Counting and Segmentation Cranberries using Point Supervision and Shape Priors
 
-[I'm an inline-style link with title](https://arxiv.org/pdf/2004.08501.pdf "Link")
+PyTorch implementation of the paper "Finding Berries: Counting and Segmentation Cranberries using Point Supervision and Shape Priors". [This](https://arxiv.org/pdf/2004.08501.pdf "Link") is the link to the paper.
 
 #### Requirements:
 
