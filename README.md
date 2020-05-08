@@ -2,11 +2,34 @@
 
 PyTorch implementation of the paper 
 ```
-"Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors". Peri Akiva, Kristin Dana, Peter Oudomous, Michael Mars. CVPRW2020. 
+"Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors". 
+Peri Akiva, Kristin Dana, Peter Oudomous, Michael Mars. CVPRW2020. 
 ```
 [This](https://arxiv.org/pdf/2004.08501.pdf "Link") is the link to the paper. This repository also features a docker container setup for training, evaluation and testing. 
 
+## Citing this work
 
+```
+@article{akiva2020finding,
+  title={Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors},
+  author={Peri Akiva and Kristin Dana and Peter Oudomous and Michael Mars},
+  journal={Proceedings of the Computer Vision and Pattern Recognition Workshops(CVPRW)},
+  month={June},
+  year={2020}
+}
+```
+
+
+## Setting up the environment
+We can set up an environment in 2 ways: locally, or in a docker container.
+
+### Locally
+
+We use Python 3.6. We recommend using Anaconda ([Available here](https://www.anaconda.com/)) to manage and install libraries. Once anaconda is installed, 
+
+
+
+### Docker
 
 
 #### Requirements:

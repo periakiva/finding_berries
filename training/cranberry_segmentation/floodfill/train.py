@@ -166,10 +166,10 @@ class Trainer(object):
             for batch_index,batch in enumerate(loader):
                 imgs,masks,count = batch
 
-
                 imgs = imgs.to(device)
                 masks = masks.to(device).squeeze(1)
                 count = count.to(device)
+
                 output, count_estimation = self.model.forward(imgs)
 
                 # output = self.model.forward(imgs)
@@ -273,7 +273,6 @@ class Trainer(object):
                     best_miou_to_mae_ratio = miou_to_mae_ratio
                         
                     with open(model_save_dir+"config.yaml",'w') as file:
-                        print(mean_ious_val)
                         config['count_metrics'] = count_metrics_list
                         config['mean_ious_val'] = mean_ious_val_list
                         config['val_losses'] = val_losses
@@ -292,14 +291,11 @@ if __name__== "__main__":
     
     config_path = utils.dictionary_contents(os.getcwd()+"/",types=["*.yaml"])[0]
     config = utils.config_parser(config_path,experiment_type="training")
-    # with open(config_path) as file:
-    #     config = yaml.load(file,Loader=yaml.FullLoader)
     config['start_time'] = datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
     
     torch.set_default_dtype(torch.float32)
     device_cpu = torch.device('cpu')
     device = torch.device('cuda:0') if config['use_cuda'] else device_cpu
-    # print(config['training']['train_val_test_split'][0])
     train_dataloader, validation_dataloader, test_dataloader = cranberry_dataset.build_train_validation_loaders(
                                                                                                                 data_dictionary=config['data']['train_dir'],batch_size=config['training']['batch_size'],
                                                                                                                 num_workers=config['training']['num_workers'],type=config['data']['type'],
@@ -319,7 +315,7 @@ if __name__== "__main__":
     class_weights = torch.Tensor((1,1)).float()
     class_weights = class_weights.to(device)
     loss_segmentation = nn.CrossEntropyLoss(class_weights)
-    # loss_convexity = loss.ConvexShapeLoss(height=456,width=608,device=device)
+
     optimizer = optim.Adam(model.parameters(),
                             lr=config['training']['learning_rate'],
                             amsgrad=True)
