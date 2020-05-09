@@ -19,13 +19,22 @@ Peri Akiva, Kristin Dana, Peter Oudomous, Michael Mars. CVPRW2020.
 }
 ```
 
+## Dataset
+We use the CRAID (CRanberry Aerial Imagery Dataset) in our experiments. The dataset can be downloaded from:
+
+\item [CRAID](https://forms.gle/zfFCKy1pyDD4WNro7)
 
 ## Setting up the environment
 We can set up an environment in 2 ways: locally, or in a docker container.
 
 ### Locally
 
-We use Python 3.6. We recommend using Anaconda ([Available here](https://www.anaconda.com/)) to manage and install libraries. Once anaconda is installed, 
+We use Python 3.6. We recommend using Anaconda ([Available here](https://www.anaconda.com/)) to manage and install libraries. Once anaconda is installed, run this command:
+
+```
+conda create --name finding_berries --file environment.txt
+```
+
 
 
 
