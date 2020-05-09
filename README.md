@@ -22,7 +22,7 @@ Peri Akiva, Kristin Dana, Peter Oudomous, Michael Mars. CVPRW2020.
 ## Dataset
 We use the CRAID (CRanberry Aerial Imagery Dataset) in our experiments. The dataset can be downloaded from:
 
-..* [CRAID](https://forms.gle/zfFCKy1pyDD4WNro7)
+  * [CRAID](https://forms.gle/zfFCKy1pyDD4WNro7)
 
 ## Setting up the environment
 We can set up an environment in 2 ways: locally, or in a docker container.
@@ -69,7 +69,7 @@ training:
 use_cuda: True
 
 ```
-
+After config file is modified, simply run the train/evaluate script that is in the same directory. Some paths might be coded into the script, so error may occur. TODO: this should be fixed in the docker approach
 
 ### Docker
 
