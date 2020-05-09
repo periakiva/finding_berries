@@ -22,20 +22,53 @@ Peri Akiva, Kristin Dana, Peter Oudomous, Michael Mars. CVPRW2020.
 ## Dataset
 We use the CRAID (CRanberry Aerial Imagery Dataset) in our experiments. The dataset can be downloaded from:
 
-\item [CRAID](https://forms.gle/zfFCKy1pyDD4WNro7)
+..* [CRAID](https://forms.gle/zfFCKy1pyDD4WNro7)
 
 ## Setting up the environment
 We can set up an environment in 2 ways: locally, or in a docker container.
 
 ### Locally
 
-We use Python 3.6. We recommend using Anaconda ([Available here](https://www.anaconda.com/)) to manage and install libraries. Once anaconda is installed, run this command:
+We use Python 3.6. We recommend using Anaconda ([Available here](https://www.anaconda.com/)) to manage and install libraries. Once anaconda is installed, run those commands:
 
 ```
 conda create --name finding_berries --file environment.txt
+conda activate finding_berries
+pip install .
 ```
 
+## Usage
+In order to run this code, adjustments should be made to the config file in training and evaluation code. Sample config file:
 
+```
+# Ours
+data:
+  type: semantic_seg # type of dataset to use. [semantic_seg,instance_seg,points]
+  model_save_dir: /path/to/directory/where/model/is/saved
+  train_dir: /path/to/train/data/
+  test_dir: /path/to/test/data/
+  val_dir: /path/to/val/data/
+  image_size: 456x608 # size of image. if image size is different than this, need to train from scratch, and not use pretrained model.
+
+training: 
+  learning_rate: 0.001 
+  resume: False # if true, insert path to the model to be resumed. Otherwise this will train from scratch
+
+  train_val_test_split: [0.9,0.05,0.05] #split of the data
+  epochs: 200
+  batch_size: 1 # what batch size to use
+  optimizer: adam # which optimizer to use
+  num_workers: # number of workers
+
+  loss_weights: {seg: 3.0, instance: 3.0, convexity: 10.0, circularity: 10.0, count: 0.2}
+  class_weights: {seg: [1,3000,'mean'], instance: [60,1,'mean']}
+
+  losses_to_use: ["instance","circularity", "count_detect"]
+  test_with_full_supervision: 1
+
+use_cuda: True
+
+```
 
 
 ### Docker
