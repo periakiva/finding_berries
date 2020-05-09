@@ -13,7 +13,7 @@ Peri Akiva, Kristin Dana, Peter Oudemans, Michael Mars. CVPRW2020.
 @article{akiva2020finding,
   title={Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors},
   author={Peri Akiva and Kristin Dana and Peter Oudemans and Michael Mars},
-  journal={Proceedings of the Computer Vision and Pattern Recognition Workshops(CVPRW)},
+  journal={Proceedings of the Computer Vision and Pattern Recognition Workshops (CVPRW)},
   month={June},
   year={2020}
 }
@@ -74,6 +74,8 @@ After config file is modified, simply run the train/evaluate script that is in t
 ### Docker
 
 
+
+
 #### Requirements:
 
 ```
@@ -102,8 +104,4 @@ urllib3=1.25.7
 yaml=0.1.7
 ```
 
-##### Can install requirements using:
-```
-$ conda create --name cranberry_counting --file requirements.txt
-```# finding_berries
-# finding_berries
+
