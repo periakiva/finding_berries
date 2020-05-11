@@ -17,15 +17,29 @@ from parse import parse
 import collections
 import random
 from PIL import ImageOps
-# import piexif as pxf
+
 
 def create_dir_if_doesnt_exist(dir_path):
+    """
+    This function creates a dictionary if it doesnt exist.
+
+    :param dir_path: string, dictionary path
+    """
     if not os.path.exists(dir_path):
         os.makedirs(dir_path)
     return
 
 def crop_and_save_single(img,crop_height,crop_width,image_save_dir,name,with_label=False):
 
+    """ crop and save single image to an equal sized sub images
+    
+    :param img: numpy array of the image
+    :param crop_height: int, height of cropped image
+    :param crop_width: int, width of cropped image
+    :param image_save_dir: string, path to directory
+    :param name: string, name of image to be saved
+    :param with_label: bool, if image array includes a mask channel
+    """
 
     assert np.mod(img.shape[0], crop_height) == 0
     assert np.mod(img.shape[1], crop_width) == 0
@@ -65,7 +79,6 @@ def get_date_from_metadata(img):
     return date_time
 
 def t2n(x):
-    # if isinstance(x,torch.Tensor):
     x = x.cpu().detach().numpy()
     return x
 
@@ -106,7 +119,6 @@ def dictionary_contents(path,types):
         for x in glob(path+type):
             files.append(os.path.join(path,x))
     return files
-    # return [os.path.join(path,x) for x in glob(path+"*.png")]
 
 def show_image(image):
     if type(image).__module__ == np.__name__:
@@ -197,8 +209,7 @@ def overlay_images(image1,image2):
     else:
         PIL2 = image2
     PIL2 = PIL2.convert("RGBA")
-    print(PIL1.size)
-    print(PIL2.size)
+
     new_img = Image.blend(PIL1,PIL2,0.5)
     return new_img
 

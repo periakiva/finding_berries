@@ -4,14 +4,6 @@ import torch
 import re
 import math
 
-# def count_errors(pred_counts,gt_counts):
-#     assert len(pred_counts) == len(gt_counts)
-#     n = len(gt_counts)
-
-#     e = np.array(pred_counts) - np.array(gt_counts)
-
-#     absolute_e = np.abs(e)
-#     ape = 
 
 def val_mae(pred_counts,gt_counts):
     n = len(gt_counts)
@@ -30,21 +22,11 @@ def val_mae(pred_counts,gt_counts):
     return score_dict
 
 
-
 def mae(pred_counts,gt_counts):
     assert len(pred_counts) == len(gt_counts)
     n = len(gt_counts)
-    # print(min(pred_counts))
-    # print(pred_counts)
-    # print(gt_counts)
     absolute_e_list = [abs(b_i - a_i) for a_i, b_i in zip(pred_counts, gt_counts)]
     sum_e_list = sum(absolute_e_list)
-
-    # e = np.array(pred_counts) - np.array(gt_counts)
-    # absolute_error = np.abs(e)
-    # sum_e = np.sum(absolute_error)
-    # print(f"list: {sum_e_list}, numpy: {sum_e}")
-    # mae = sum_e/n
     mae = sum_e_list/n
     return mae
 
@@ -56,11 +38,7 @@ def rmse(pred_counts,gt_counts):
     sum_e_list = sum(absolute_e_list)
     sum_e_list = sum_e_list/n
     rmse = math.sqrt(sum_e_list)
-    # e = np.array(pred_counts) - np.array(gt_counts)
-    # absolute_error = np.abs(e)*np.abs(e)
-    # sum_e = np.sum(absolute_error)
-    # sum_e = sum_e/n
-    # rmse = math.sqrt(sum_e)
+
     return rmse
 
 

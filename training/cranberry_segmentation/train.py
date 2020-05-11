@@ -77,59 +77,6 @@ class Trainer(object):
         else:
             self.test_with_full_supervision = test_with_full_supervision
 
-    def visualizer(self,pred,imgs,masks,epoch,loss_type,estimated_count,gt_count):
-
-        if pred.shape[0]>1 and len(pred.shape)==3:
-            print(f"pred mask: {pred.shape}")
-            pred = pred[0,:,:]
-            imgs = imgs[0,:,:,].unsqueeze_(0)
-            masks = masks[0,:,:,].unsqueeze_(0)
-        imgs = imgs.cpu().detach().numpy().squeeze()
-        masks = masks.cpu().detach().numpy()
-        blobs = pred==1
-        # labels, nlabels = ndimage.label(blobs)
-        labels, nlabels = morphology.label(blobs,return_num=True)
-
-        count_by_detection = 0
-        for label in range(1,nlabels):
-            inds = np.argwhere(labels==label)
-            area = inds.shape[0]
-            x = inds[:,0]
-            y = inds[:,1]
-            if area < 20:
-                labels[x,y] = 0
-            if area > 20:
-                count_by_detection = count_by_detection + 1
-        cmap = plt.cm.get_cmap('tab10')
-        labels_imshow = np.ma.masked_where(labels==0,labels)
-
-        fig = plt.figure()
-        ax1 = fig.add_subplot(3,2,1)
-        ax1.title.set_text("Semantic Prediction")
-        ax1.imshow(pred)
-
-        ax2 = fig.add_subplot(3,2,2)
-        ax2.title.set_text("GT")
-        ax2.imshow(np.transpose(masks,(1,2,0)).squeeze())
-
-        ax3 = fig.add_subplot(3,2,3)
-        ax3.title.set_text("Image")
-        ax3.imshow(np.transpose(imgs,(1,2,0)))
-
-        ax4 = fig.add_subplot(3,2,4)
-        ax4.title.set_text("Instance Overlay")
-        ax4.imshow(np.transpose(imgs,(1,2,0)))
-        ax4.imshow(labels_imshow,interpolation='none',cmap=cmap,alpha=0.9,vmin=0)
-
-        ax5 = fig.add_subplot(3,2,5)
-        ax5.imshow(labels,cmap=cmap)
-        ax5.title.set_text("Instance Prediction")
-        
-        fig.suptitle(f"Segmentation with {loss_type} Loss Results after {epoch} epochs\ngt count: {gt_count}, regress count: {round(estimated_count)} count_detection: {round(count_by_detection)}",
-                        y=0.98)
-        
-        return fig
-
     def train(self,epoch,cometml_experiemnt):
         total_loss = 0 
         # total_loss_dict = {"inst_loss""cvx_loss""circ_loss""closs"}
@@ -140,44 +87,17 @@ class Trainer(object):
             imgs = imgs.to(device)
             masks = masks.to(device).squeeze(1)
             self.optimizer.zero_grad()
-            # output = self.model.forward(imgs)
-            # print(imgs.shape)
-            # print(masks.shape)
-            # S_numpy = utils.t2n(output[0])
-            # masks_watershed = utils.t2n(masks).copy().squeeze()
-            # masks_watershed[masks_watershed!=0] = np.arange(1,masks_watershed.sum()+1)
-            # masks_watershed = masks_watershed.astype(float)
-            # pred_mask = output.data.max(1)[1].squeeze().cpu().numpy()
-            # probs = ndimage.black_tophat(pred_mask.copy(),7)
-            # print(f"masks_watershed: {masks_watershed.shape} pred_mask: {pred_mask.shape}, probs: {probs.shape}")
-            # seg = watershed(probs,masks_watershed)
-            # s = find_boundaries(seg)
 
-            # fig = plt.figure()
-            # ax1 = fig.add_subplot(1,3,1)
-            # ax1.imshow(masks_watershed)
-            # ax2 = fig.add_subplot(1,3,2)
-            # ax2.imshow(pred_mask)
-            # ax3 = fig.add_subplot(1,3,3)
-            # ax3.imshow(s)
-            # plt.show()
-            # # probs = S_numpy[255]
-            # print(f"pred mask: {pred_mask.shape}")
-
-            # loss = self.criterion(output,masks)
             loss, loss_dict = losses.count_segment_loss(model,batch,self.losses_to_use,self.loss_weights,self.class_weights)
             loss.backward()
             self.optimizer.step()
             total_loss +=loss.item()
             # for key in loss_dict.keys():
             #     losses_dict[key] +=loss_dict[key].item()
-            
-        # if (epoch+1)%5 == 0:
-        #     print(loss_dict)
+
         cometml_experiemnt.log_metric("Training Average Loss",total_loss/self.train_loader.__len__(),epoch=epoch+1)
         for key in losses_dict.keys():
             cometml_experiemnt.log_metric("Training " + key +" Loss",losses_dict[key]/self.train_loader.__len__(),epoch=epoch+1)
-        # cometml_experiemnt.log_metrics(total_loss/self.train_loader.__len__(),epoch=epoch)
             
         print("Training Epoch {0:2d} average loss: {1:1.2f}".format(epoch+1, total_loss/self.train_loader.__len__()))
 
@@ -198,23 +118,10 @@ class Trainer(object):
             for batch_index,batch in enumerate(loader):
                 imgs,masks,count = batch
 
-
-                # f = plt.figure()
-                # ax1 = f.add_subplot(1,2,1)
-                # ax1.imshow(np.transpose(imgs.numpy().squeeze(),(1,2,0)))
-                # ax2 = f.add_subplot(1,2,2)
-                # ax2.imshow(np.transpose(masks.numpy(),(1,2,0)).squeeze())
-            
-                # plt.show()
-
-
                 imgs = imgs.to(device)
                 masks = masks.to(device).squeeze(1)
                 count = count.to(device)
                 output, count_estimation = self.model.forward(imgs)
-
-                # output = self.model.forward(imgs)
-                # count_estimation = torch.Tensor([0])
                 
                 loss = self.criterion(output,masks)
                 pred = output.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
@@ -283,8 +190,62 @@ class Trainer(object):
         cometml_experiemnt.log_metric("Validation Average Loss",total_loss/self.val_loader.__len__(),epoch=epoch+1)
 
         return total_loss/self.val_loader.__len__(), mean_iou,count_metrics
-    
+
+    def visualizer(self,pred,imgs,masks,epoch,loss_type,estimated_count,gt_count):
+
+        if pred.shape[0]>1 and len(pred.shape)==3:
+            print(f"pred mask: {pred.shape}")
+            pred = pred[0,:,:]
+            imgs = imgs[0,:,:,].unsqueeze_(0)
+            masks = masks[0,:,:,].unsqueeze_(0)
+        imgs = imgs.cpu().detach().numpy().squeeze()
+        masks = masks.cpu().detach().numpy()
+        blobs = pred==1
+        # labels, nlabels = ndimage.label(blobs)
+        labels, nlabels = morphology.label(blobs,return_num=True)
+
+        count_by_detection = 0
+        for label in range(1,nlabels):
+            inds = np.argwhere(labels==label)
+            area = inds.shape[0]
+            x = inds[:,0]
+            y = inds[:,1]
+            if area < 20:
+                labels[x,y] = 0
+            if area > 20:
+                count_by_detection = count_by_detection + 1
+        cmap = plt.cm.get_cmap('tab10')
+        labels_imshow = np.ma.masked_where(labels==0,labels)
+
+        fig = plt.figure()
+        ax1 = fig.add_subplot(3,2,1)
+        ax1.title.set_text("Semantic Prediction")
+        ax1.imshow(pred)
+
+        ax2 = fig.add_subplot(3,2,2)
+        ax2.title.set_text("GT")
+        ax2.imshow(np.transpose(masks,(1,2,0)).squeeze())
+
+        ax3 = fig.add_subplot(3,2,3)
+        ax3.title.set_text("Image")
+        ax3.imshow(np.transpose(imgs,(1,2,0)))
+
+        ax4 = fig.add_subplot(3,2,4)
+        ax4.title.set_text("Instance Overlay")
+        ax4.imshow(np.transpose(imgs,(1,2,0)))
+        ax4.imshow(labels_imshow,interpolation='none',cmap=cmap,alpha=0.9,vmin=0)
+
+        ax5 = fig.add_subplot(3,2,5)
+        ax5.imshow(labels,cmap=cmap)
+        ax5.title.set_text("Instance Prediction")
+        
+        fig.suptitle(f"Segmentation with {loss_type} Loss Results after {epoch} epochs\ngt count: {gt_count}, regress count: {round(estimated_count)} count_detection: {round(count_by_detection)}",
+                        y=0.98)
+        
+        return fig
+
     def forward(self,cometml_experiment):
+
         train_losses = []
         val_losses = []
         mean_ious_val,mean_ious_val_list,count_metrics_list = [], [], []
@@ -298,6 +259,7 @@ class Trainer(object):
         counting_type = self.losses_to_use[-1]
         model_save_dir = config['data']['model_save_dir']+f"{current_path[-1]}/{cometml_experiment.project_name}_{empty_string.join(self.losses_to_use)}_{loss_weights_str}_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}/"
         utils.create_dir_if_doesnt_exist(model_save_dir)
+        
         for epoch in range(0,self.epochs):
             with cometml_experiment.train():
                 train_loss = self.train(epoch,cometml_experiment)
@@ -350,7 +312,7 @@ if __name__== "__main__":
     torch.set_default_dtype(torch.float32)
     device_cpu = torch.device('cpu')
     device = torch.device('cuda:0') if config['use_cuda'] else device_cpu
-    # print(config['training']['train_val_test_split'][0])
+
     train_dataloader, validation_dataloader, test_dataloader = cranberry_dataset.build_train_validation_loaders(
                                                                                                                 data_dictionary=config['data']['train_dir'],batch_size=config['training']['batch_size'],
                                                                                                                 num_workers=config['training']['num_workers'],type=config['data']['type'],
@@ -371,14 +333,14 @@ if __name__== "__main__":
     class_weights = torch.Tensor((1,1)).float()
     class_weights = class_weights.to(device)
     loss_segmentation = nn.CrossEntropyLoss(class_weights)
-    # loss_convexity = loss.ConvexShapeLoss(height=456,width=608,device=device)
+
     optimizer = optim.Adam(model.parameters(),
                             lr=config['training']['learning_rate'],
                             amsgrad=True)
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,len(train_dataloader),eta_min = config['training']['learning_rate'])
     start_epoch = 0
     lowest_mahd = np.infty
-    #TODO: Add resume option to Trainer using below code
+
     if config['training']['resume'] != False:
         with peter('Loading checkpoints'):
             if os.path.isfile(config['training']['resume']):
@@ -394,6 +356,7 @@ if __name__== "__main__":
             else:
                 print("no checkpoint found at {}".format(config['training']['resume']))
                 exit()
+
     print(f"using losses: {config['training']['losses_to_use']}")
     # running_average = utils.RunningAverage(len(train_dataloader))
     trainer = Trainer(model,train_dataloader,validation_dataloader,config['training']['epochs'],
@@ -401,20 +364,9 @@ if __name__== "__main__":
                         test_loader=fs_test_loader,
                         test_with_full_supervision=config['training']['test_with_full_supervision'],
                         loss_weights=config['training']['loss_weights'],class_weights = config['training']['class_weights'])
+    
     train_losses, val_losses, mean_ious_val = trainer.forward(experiment)
-    # epoch = start_epoch
-    # iteration = 0
-    # train_losses = []
-    # val_losses = []
-    # mean_ious_val = []
-    # for epoch in range(0,config.epochs):
-    #     train_loss = trainer.train(epoch)
-    #     train_losses.append(train_loss)
-    #     val_loss, val_mean_iou = trainer.validate(epoch)
-    #     # train_loss.append(train(train_dataloader,epoch))
-    #     # v_loss, v_mean_iou = validate(validation_dataloader,epoch)
-    #     val_losses.append(v_loss)
-    #     mean_ious_val.append(val_mean_iou)
+
 
 
             
