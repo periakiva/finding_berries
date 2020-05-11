@@ -1,3 +1,13 @@
+"""
+This file contains the cranberry dataset. It has 3 types of datasets that fit
+3 types of data stucture. 
+Instace: data has masks with different values for each instance
+Points: point data is used from a CSV file
+Semantic: data has masks with same value
+
+"""
+
+
 import sys
 import os
 current_path = os.getcwd().split("/")
@@ -5,7 +15,8 @@ current_path = os.getcwd().split("/")
 if "projects" in current_path:
     sys.path.append("/home/native/projects/finding_berries/")
 else:
-    sys.path.append("/data/cranberry_counting/")
+    sys.path.append("/data/finding_berries/")
+
 import torchvision.transforms.functional as FT
 from torch.utils.data import Dataset
 from PIL import Image
@@ -44,22 +55,7 @@ def build_single_loader(data_dictionary,batch_size,num_workers,type = False,test
                         # [transforms.Normalize(*mean_std), None],
                         [utils.ToFloat(),  utils.ToLong() ]
                         ])
-    
-    # transformations = {
-    #         'img':transforms.Compose([
-    #                 transforms.ToPILImage(),
-    #                 transforms.RandomResizedCrop(224),
-    #                 # transforms.Grayscale(num_output_channels=3),
-    #                 # transforms.Lambda(gaussian_blur),
-    #                 transforms.ToTensor(),
-    #                 # transforms.Normalize([0.485,0.485,0.406], [0.229, 0.224, 0.225])
-    #                 ]),
-    #         'mask':transforms.Compose([
-    #                 transforms.ToPILImage(),
-    #                 transforms.RandomResizedCrop(224),
-    #                 transforms.ToTensor()
-    #                 ])
-    #             }
+
     if type == "instance_seg":
         test_dataset = CBDatasetInstanceSeg(directory=data_dictionary,transforms=transformer,target_transforms=transformer,test=test,has_mask=has_mask)
     else:
@@ -85,35 +81,16 @@ def build_train_validation_loaders(data_dictionary,batch_size,num_workers,type =
                         # [transforms.Normalize(*mean_std), None],
                         [utils.ToFloat(),  utils.ToLong() ]
                         ])
-    
-    # transformations = {
-    #         'img':transforms.Compose([
-    #                 transforms.ToPILImage(),
-    #                 transforms.RandomResizedCrop(224),
-    #                 transforms.RandomHorizontalFlip(),
-    #                 transforms.ToTensor()
-    #                 # transforms.Normalize([0.485,0.485,0.406], [0.229, 0.224, 0.225])
-    #                 ]),
-    #         'mask':transforms.Compose([
-    #                 transforms.ToPILImage(),
-    #                 transforms.RandomResizedCrop(224),
-    #                 transforms.RandomHorizontalFlip(),
-    #                 transforms.ToTensor()
-    #                 ])
-    #             }
-    print(data_dictionary)
+
     if type.lower() == 'instance_seg':
         dataset = CBDatasetInstanceSeg(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
-        data_dictionary = data_dictionary + "/images/"
     elif type.lower() == 'points':
         dataset = CBDatasetPoints(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
-        data_dictionary = data_dictionary + "/images/"
     elif type.lower() == 'points_expand':
         dataset = CBDatasetPointsPixelExpansion(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
-        data_dictionary = data_dictionary + "/images/"
-    else:
+    elif type.lower() == 'semantic_seg':
         dataset = CBDatasetSemanticSeg(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
-        data_dictionary = data_dictionary + "/images/"
+    data_dictionary = data_dictionary + "/images/"
     train_size = math.ceil(int(len(utils.dictionary_contents(data_dictionary,types=IMG_EXTENSIONS)))*train_val_test_split[0])
     val_size = math.floor(int(len(utils.dictionary_contents(data_dictionary,types=IMG_EXTENSIONS)))*train_val_test_split[1])
     test_size = int(len(utils.dictionary_contents(data_dictionary,types=IMG_EXTENSIONS))) - train_size - val_size
@@ -142,18 +119,14 @@ def build_train_validation_loaders(data_dictionary,batch_size,num_workers,type =
 
 class CBDatasetPointsPixelExpansion(Dataset):
     def __init__(self,directory,transforms=None,target_transforms=None,test=False,has_mask=True):
-        """CBDataset: Cranberry Dataset.
+        """
+        CBDataset: Cranberry Dataset.
         The sample images of this dataset must be all inside one directory.
-        Inside the same directory, there must be one CSV file.
-        This file must contain one row per image.
-        It can contain as many columns as wanted, i.e, filename, count...
 
         :param directory: Directory with all the images and the CSV file.
         :param transform: Transform to be applied to each image.
-        :param max_dataset_size: Only use the first N images in the directory.
-        :param ignore_gt: Ignore the GT of the dataset,
-                          i.e, provide samples without locations or counts.
-        :param seed: Random seed.
+        :param test: if this dataset is to be tested
+        :param has_mask: if the data has masks
         """
 
         self.test = test
@@ -223,10 +196,8 @@ class CBDatasetPoints(Dataset):
 
         :param directory: Directory with all the images and the CSV file.
         :param transform: Transform to be applied to each image.
-        :param max_dataset_size: Only use the first N images in the directory.
-        :param ignore_gt: Ignore the GT of the dataset,
-                          i.e, provide samples without locations or counts.
-        :param seed: Random seed.
+        :param test: if this dataset is to be tested
+        :param has_mask: if the data has masks
         """
 
         self.test = test
@@ -315,16 +286,12 @@ class CBDatasetSemanticSeg(Dataset):
     def __init__(self,directory,transforms=None,target_transforms=None,test=False,has_mask=True):
         """CBDataset: Cranberry Dataset.
         The sample images of this dataset must be all inside one directory.
-        Inside the same directory, there must be one CSV file.
-        This file must contain one row per image.
-        It can contain as many columns as wanted, i.e, filename, count...
 
         :param directory: Directory with all the images and the CSV file.
         :param transform: Transform to be applied to each image.
-        :param max_dataset_size: Only use the first N images in the directory.
-        :param ignore_gt: Ignore the GT of the dataset,
-                          i.e, provide samples without locations or counts.
-        :param seed: Random seed.
+        :param test: if this dataset is to be tested
+        :param has_mask: if the data has masks
+ 
         """
 
         self.transforms = transforms
@@ -346,12 +313,6 @@ class CBDatasetSemanticSeg(Dataset):
         if len(self.image_paths) == 0:
             raise ValueError("There are no images in {}".format(directory))
         
-        # self.csv_path = None
-        # elif self.csv_path == None:
-        #     raise ValueError("There is no groundtruth in {}".format(directory))
-        # self.csv_path = utils.dictionary_contents(directory,types=["*.csv"])[0]
-        # self.csv_df = pd.read_csv(self.csv_path)
-        # self.csv_df = self.csv_df.sample(frac=1).reset_index(drop=True)
 
     def __len__(self):
         return len(self.image_paths)
@@ -372,49 +333,24 @@ class CBDatasetSemanticSeg(Dataset):
             back_mask = np.array(back_mask)
             back_mask[back_mask==1] = 2
             mask = mask + back_mask
-        # print(np.unique(mask))
-        # print(np.unique(back_mask))
-        # print(np.unique(masks))
-        # if self.test:
-        #     if self.has_mask:
-        #         collections = list(map(FT.to_pil_image,[image,mask]))
-        #         transformed_img, transformed_mask = self.transforms(collections)
-        #         return transformed_img, transformed_mask
-        #     else:
-        #         transformed_img, transformed_img = self.transforms(image,image)
-        #         return transformed_img, mask
-        # image = torch.as_tensor(image)
-        # mask = torch.as_tensor(mask).unsqueeze(dim=0)
-        # print(mask.shape)
+
         if self.transforms is not None:
             collections = list(map(FT.to_pil_image,[image,mask]))
             transformed_img,tranformed_mask = self.transforms(collections)
             return transformed_img, tranformed_mask,count#, img_path
-
-        # if self.transforms is not None:
-        #     seed = np.random.randint(1000)
-        #     random.seed(seed)
-        #     transformed_img = self.transforms['img'](image).float()
-        #     random.seed(seed)
-        #     tranformed_mask = self.target_transforms['mask'](mask).long()
             
-        
         return image,mask,count #,img_path
 
 class CBDatasetInstanceSeg(Dataset):
     def __init__(self,directory,transforms=None,target_transforms=None,test=False,has_mask=True):
-        """CBDataset: Cranberry Dataset.
+        """
+        CBDataset: Cranberry Dataset.
         The sample images of this dataset must be all inside one directory.
-        Inside the same directory, there must be one CSV file.
-        This file must contain one row per image.
-        It can contain as many columns as wanted, i.e, filename, count...
 
         :param directory: Directory with all the images and the CSV file.
         :param transform: Transform to be applied to each image.
-        :param max_dataset_size: Only use the first N images in the directory.
-        :param ignore_gt: Ignore the GT of the dataset,
-                          i.e, provide samples without locations or counts.
-        :param seed: Random seed.
+        :param test: if this dataset is to be tested
+        :param has_mask: if the data has masks
         """
 
         self.root_dir = directory
@@ -435,16 +371,7 @@ class CBDatasetInstanceSeg(Dataset):
         if len(self.image_paths) == 0:
             raise ValueError("There are no images in {}".format(directory))
 
-        
-        # elif self.csv_path == None:
-        #     raise ValueError("There is no groundtruth in {}".format(directory))
-        # self.csv_path = None
-        # self.csv_path = utils.dictionary_contents(directory,types=["*.csv"])[0]
-        # self.csv_df = pd.read_csv(self.csv_path)
-        # self.csv_df = self.csv_df.sample(frac=1).reset_index(drop=True)
-
     def __len__(self):
-
         return len(self.image_paths)
 
     def __getitem__(self,index):
@@ -473,6 +400,7 @@ class CBDatasetInstanceSeg(Dataset):
         #     cv2.rectangle(cvimg,(x1,y1),(x2,y2),(0,255,0))
         # cv2.imshow("rectangles for sanity check",cvimg)
         # cv2.waitKey(0)
+        #############################################
 
         masks = torch.as_tensor(masks, dtype=torch.uint8)
         # img_mask = np.transpose(img_mask,(2,0,1))
@@ -497,12 +425,6 @@ class CBMaskRCNNDataset(Dataset):
 
         self.image_paths = sorted(utils.dictionary_contents(self.images_path,types=IMG_EXTENSIONS))
         self.mask_paths = sorted(utils.dictionary_contents(self.masks_path,types=IMG_EXTENSIONS))
-
-        
-        # self.csv_path = None
-        # self.csv_path = utils.dictionary_contents(directory,types=["*.csv"])[0]
-        # self.csv_df = pd.read_csv(self.csv_path)
-        # self.csv_df = self.csv_df.sample(frac=1).reset_index(drop=True)
 
     def __getitem__(self, idx):
         img_path = self.image_paths[idx]
@@ -529,24 +451,6 @@ class CBMaskRCNNDataset(Dataset):
             ymin = np.min(pos[0])
             ymax = np.max(pos[0])
             boxes.append([xmin, ymin, xmax, ymax])
-        # print(f"number of objects: {num_objs}, numbers of masks: {masks.shape}")
-        ### sanity check for boxes #####
-        # cvimg = cv2.imread(img_path)
-        # cvimg = np.asarray(image)
-        # fig = plt.figure()
-        # ax = fig.add_subplot(111, aspect='equal')
-        # ax.imshow(cvimg)
-        # for box in boxes:
-        #     x1,y1,x2,y2 = box
-        #     # print(f"output from dataloader: {box}")
-        #     # print(f"x1:{x1}\ny1:{y1}\nx2:{x2}\ny2:{y2}")
-        #     # cv2.rectangle(cvimg,(x1,y1),(x2,y2),(255,255,0))
-        #     # rect = patches.Rectangle((x1,y2),x2-x1,y2-y1,fill=False,edgecolor='r')
-        #     rect = patches.Rectangle((x1,y1),x2-x1,y2-y1,fill=False,edgecolor='r')
-        #     ax.add_patch(rect)
-        # cv2.imshow("rectangles for sanity check maskrcnn dataq",cvimg)
-        # cv2.waitKey(0)
-        # plt.show()
 
 
         # convert everything into a torch.Tensor
