@@ -1,10 +1,14 @@
+"""
+Main training file. Config file should be in the same directory.
+"""
+
 import sys
 import os
 current_path = os.getcwd().split("/")
 if 'projects' in current_path:
-    sys.path.append("/home/native/projects/cranberry_counting/")
+    sys.path.append("/home/native/projects/finding_berries/")
 else:
-    sys.path.append("/data/cranberry_counting/")
+    sys.path.append("/data/finding_berries/")
 
 import gc
 import comet_ml
@@ -36,7 +40,22 @@ warnings.filterwarnings('ignore')
 
 class Trainer(object):
     def __init__(self,model,train_loader,val_loader,epochs,optimizer,scheduler,
-                    criterion,losses_to_use,test_loader = None, test_with_full_supervision = 0,loss_weights=[1.0,1.0,1.0],class_weights={}):
+                    criterion,losses_to_use,test_loader = None, test_with_full_supervision = 0,loss_weights={}},class_weights={}):
+
+        """
+        :param model: PyTorch module, model to be trained
+        :param train_loader: dataloader for training
+        :param val_loader: dataloader for validation
+        :param epoch: int, number of epochs
+        :param optimizer: optimizer
+        :param scheduler: scheduler
+        :param criterion: loss function module
+        :param losses_to_use: list with types of losses to use
+        :param test_loader: optional, dataloader for testing
+        :param test_with_full_supervision: bool, if test set is fully supervsied or points
+        :param loss_weights: dictionary with weights for losses
+
+        """
 
         self.model = model
         self.train_loader = train_loader
