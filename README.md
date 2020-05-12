@@ -61,7 +61,7 @@ training:
   num_workers: # number of workers
 
   loss_weights: {seg: 3.0, instance: 3.0, convexity: 10.0, circularity: 10.0, count: 0.2}
-  class_weights: {seg: [1,3000,'mean'], instance: [60,1,'mean']}
+  class_weights: {seg: [1,3,'mean'], instance: [6,1,'mean']}
 
   losses_to_use: ["instance","circularity", "count_detect"]
   test_with_full_supervision: 1
