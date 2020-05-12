@@ -4,7 +4,7 @@ current_path = os.getcwd().split("/")
 if 'projects' in current_path:
     sys.path.append("/home/native/projects/finding_berries/")
 else:
-    sys.path.append("/data/cranberry_counting/")
+    sys.path.append("/data/finding_berries/")
 
 import gc
 import comet_ml
@@ -37,6 +37,21 @@ warnings.filterwarnings('ignore')
 class Trainer(object):
     def __init__(self,model,train_loader,val_loader,epochs,optimizer,scheduler,
                     criterion,losses_to_use,test_loader = None, test_with_full_supervision = 0,loss_weights=[1.0,1.0,1.0],class_weights={}):
+
+        """
+        :param model: PyTorch module, model to be trained
+        :param train_loader: dataloader for training
+        :param val_loader: dataloader for validation
+        :param epoch: int, number of epochs
+        :param optimizer: optimizer
+        :param scheduler: scheduler
+        :param criterion: loss function module
+        :param losses_to_use: list with types of losses to use
+        :param test_loader: optional, dataloader for testing
+        :param test_with_full_supervision: bool, if test set is fully supervsied or points
+        :param loss_weights: dictionary with weights for losses
+
+        """
 
         self.model = model
         self.train_loader = train_loader
@@ -121,31 +136,16 @@ class Trainer(object):
             masks = masks.to(device).squeeze(1)
             self.optimizer.zero_grad()
 
-            # output = self.model.forward(imgs)
-            # S_numpy = utils.t2n(output[0])
-            # masks_watershed = utils.t2n(masks).copy().squeeze()
-            # masks_watershed[masks_watershed!=0] = np.arange(1,masks_watershed.sum()+1)
-            # masks_watershed = masks_watershed.astype(float)
-            # pred_mask = output.data.max(1)[1].squeeze().cpu().numpy()
-            # probs = ndimage.black_tophat(pred_mask.copy(),7)
-            # print(f"masks_watershed: {masks_watershed.shape} pred_mask: {pred_mask.shape}, probs: {probs.shape}")
-            # seg = watershed(probs,masks_watershed)
-            # s = find_boundaries(seg)
-
-            # loss = self.criterion(output,masks)
             loss, loss_dict = losses.count_segment_loss(model,batch,self.losses_to_use,self.loss_weights,self.class_weights)
             loss.backward()
             self.optimizer.step()
             total_loss +=loss.item()
             for key in loss_dict.keys():
                 losses_dict[key] +=loss_dict[key].item()
-            
-        if (epoch+1)%5 == 0:
-            print(loss_dict)
+
         cometml_experiemnt.log_metric("Training Average Loss",total_loss/self.train_loader.__len__(),epoch=epoch+1)
         for key in losses_dict.keys():
             cometml_experiemnt.log_metric("Training " + key +" Loss",losses_dict[key]/self.train_loader.__len__(),epoch=epoch+1)
-        # cometml_experiemnt.log_metrics(total_loss/self.train_loader.__len__(),epoch=epoch)
             
         print("Training Epoch {0:2d} average loss: {1:1.2f}".format(epoch+1, total_loss/self.train_loader.__len__()))
 
@@ -171,9 +171,6 @@ class Trainer(object):
                 count = count.to(device)
 
                 output, count_estimation = self.model.forward(imgs)
-
-                # output = self.model.forward(imgs)
-                # count_estimation = torch.Tensor([0])
                 
                 loss = self.criterion(output,masks)
                 pred = output.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
@@ -310,7 +307,6 @@ if __name__== "__main__":
     # model = nn.DataParallel(model)
     model.to(device)
     model.cuda()
-    
 
     class_weights = torch.Tensor((1,1)).float()
     class_weights = class_weights.to(device)
@@ -322,43 +318,29 @@ if __name__== "__main__":
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,len(train_dataloader),eta_min = config['training']['learning_rate'])
     start_epoch = 0
     lowest_mahd = np.infty
+
     #TODO: Add resume option to Trainer using below code
     if config['training']['resume'] != False:
         with peter('Loading checkpoints'):
             if os.path.isfile(config['training']['resume']):
                 # model = torch.load(config['training']['resume'])
                 checkpoint = torch.load(config['training']['resume'])
-                # print(checkpoint)
                 start_epoch = checkpoint['epoch']
                 model.load_state_dict(checkpoint['model'])
                 optimizer.load_state_dict(checkpoint['optimizer'])
-                # scheduler.load_state_dict(checkpoint['scheduler'])
+                scheduler.load_state_dict(checkpoint['scheduler'])
                 print(f"loaded model from {config['training']['resume']}")
-                # print("Loaded checkpoint {}, now at epoch: {}".format(config['training']['resume'],checkpoint['epoch']))        
             else:
                 print("no checkpoint found at {}".format(config['training']['resume']))
                 exit()
     print(f"using losses: {config['training']['losses_to_use']}")
-    # running_average = utils.RunningAverage(len(train_dataloader))
+
     trainer = Trainer(model,train_dataloader,validation_dataloader,config['training']['epochs'],
                         optimizer,scheduler,loss_segmentation,losses_to_use=config['training']['losses_to_use'],
                         test_loader=fs_test_loader,
                         test_with_full_supervision=config['training']['test_with_full_supervision'],
                         loss_weights=config['training']['loss_weights'],class_weights = config['training']['class_weights'])
     train_losses, val_losses, mean_ious_val = trainer.forward(experiment)
-    # epoch = start_epoch
-    # iteration = 0
-    # train_losses = []
-    # val_losses = []
-    # mean_ious_val = []
-    # for epoch in range(0,config.epochs):
-    #     train_loss = trainer.train(epoch)
-    #     train_losses.append(train_loss)
-    #     val_loss, val_mean_iou = trainer.validate(epoch)
-    #     # train_loss.append(train(train_dataloader,epoch))
-    #     # v_loss, v_mean_iou = validate(validation_dataloader,epoch)
-    #     val_losses.append(v_loss)
-    #     mean_ious_val.append(val_mean_iou)
 
 
             
