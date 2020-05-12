@@ -2,9 +2,9 @@ import sys
 import os
 current_path = os.getcwd().split("/")
 if 'projects' in current_path:
-    sys.path.append("/home/native/projects/cranberry_counting/")
+    sys.path.append("/home/native/projects/finding_berries/")
 else:
-    sys.path.append("/data/cranberry_counting/")
+    sys.path.append("/data/finding_berries/")
 
 import gc
 import comet_ml
@@ -138,17 +138,6 @@ class Evaluator(object):
         labels, nlabels = morphology.label(blobs,return_num=True)
         gt_labels,ngt = morphology.label(gt,return_num=True)
 
-        # count_by_detection = 0
-        # for label in range(1,nlabels):
-        #     inds = np.argwhere(labels==label)
-        #     area = inds.shape[0]
-        #     x = inds[:,0]
-        #     y = inds[:,1]
-        #     if area < 20:
-        #         labels[x,y] = 0
-        #     if area > 20:
-        #         count_by_detection = count_by_detection + 1
-
         file_name = f"gt_{gt_count}_pred_{nlabels}"
 
         cmap = plt.cm.get_cmap('tab10')
@@ -204,19 +193,7 @@ class Evaluator(object):
         # plt.margins(0,0)
         plt.gca().xaxis.set_major_locator(plt.NullLocator())
         plt.gca().yaxis.set_major_locator(plt.NullLocator())
-        # image_fig.savefig(f"/home/native/projects/data/cranberry/visuals/paper/visual_results/image/image_{file_name}.png",dpi=600,bbox_inches='tight',pad_inches = 0)
-        # plt.show()
-        # ax4 = fig.add_subplot(3,2,4)
-        # ax4.title.set_text("Instance Overlay")
-        # ax4.imshow(np.transpose(imgs,(1,2,0)))
-        # ax4.imshow(labels_imshow,interpolation='none',cmap=cmap,alpha=0.9,vmin=0)
 
-        # ax5 = fig.add_subplot(3,2,5)
-        # ax5.imshow(labels,cmap=cmap)
-        # ax5.title.set_text("Instance Prediction")
-        
-        # fig.suptitle(f"gt count: {gt_count}, regress count: {round(estimated_count)} count_detection: {round(detection_count)}",
-        #                 y=0.98)
         instance_fig.clear()
         gt_fig.clear()
         image_fig.clear()
@@ -380,8 +357,6 @@ if __name__ == "__main__":
     class_weights = class_weights.to(device)
     loss_segmentation = nn.CrossEntropyLoss(class_weights)
 
-    # model = torch.load(config['data']['model_name'])
-    # model.load_state_dict(checkpoint['model'])
 
     evalutor = Evaluator(model=model,test_loader = test_loader,
                         criterion=loss_segmentation,has_mask=config['data']['has_mask'],
