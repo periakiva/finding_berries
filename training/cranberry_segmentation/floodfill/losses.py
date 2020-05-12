@@ -329,7 +329,7 @@ def count_segment_loss(model,batch,losses_to_use,loss_weights,class_weights):
         class_weights {dictionary} -- dictionary with losses and weights for each class (here we have 2 classes) 
 
     Returns:
-        loss -- overall loss of the model
+        int, dictionary -- overall loss of the model and dictionary of each loss value
     """
     model.train()
 
