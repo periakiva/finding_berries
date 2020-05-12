@@ -15,11 +15,7 @@ import pdb;
 
 
 def segmentation_loss(pred,gt,seg_weights):
-    
-    # pred = F.softmax(pred,1)
-    # n,k,h,w = pred.size()
-    # pred = pred.view(n,k,h*w).max(1)[0].view(-1)
-    # seg_loss = F.binary_cross_entropy(pred, gt.float(),reduction='sum')
+
     seg_loss = F.cross_entropy(pred, gt, weight=torch.Tensor((seg_weights[0],seg_weights[1])).float().cuda(),reduction=seg_weights[2])
     return seg_loss
 
@@ -30,13 +26,6 @@ def detection_based_count_loss(pred,gt_count):
     labels, nlabels = ndimage.label(blobs)
     # labels, nlabels = morphology.label(blobs)
     count = nlabels - 1
-    # for label in range(1,nlabels):
-    #     inds = np.argwhere(labels==label)
-    #     area = inds.shape[0]
-
-    #     if area > 20:
-    #         count = count +1
-    # print(nlabels)
     
     closs = F.smooth_l1_loss(torch.Tensor([count]).cuda(),gt_count,reduction='mean')
     # print(f"closs: {closs}, gt: {gt_count}, predicted: {count}, tensor predicted: {torch.Tensor([count]).shape}, tensor predicted: {torch.Tensor([count])}")
@@ -51,6 +40,15 @@ def regression_based_count_loss(count_estimation,gt_count):
     return closs
 
 def circularity_loss(pred,gt):
+    """circularity_loss calculates and outputs the circularity loss
+
+    Arguments:
+        pred {tensor} -- prediction from model
+        gt {tensor} -- ground truth tensor
+
+    Returns:
+        PyTorch huber loss -- circularity loss
+    """
     pred_mask = pred.data.max(1)[1].squeeze().cpu().numpy()
     blobs = pred_mask==1
     labels, nlabels = ndimage.label(blobs)
@@ -99,18 +97,21 @@ def circularity_loss(pred,gt):
     return circ_loss
 
 def convexity_loss(pred,gt):
+    """convexity_loss calculates and outputs the convexity loss
+
+    Arguments:
+        pred {tensor} -- prediction from model
+        gt {tensor} -- ground truth
+
+    Returns:
+        PyTorch Huber loss -- regression loss over convexity
+    """
     pred_mask = pred.data.max(1)[1].squeeze().cpu().numpy()
     blobs = pred_mask==1
     labels, nlabels = ndimage.label(blobs)
     convexity_pred = []
     convexity_target = []
-    # fig = plt.figure()
-    # ax1 = fig.add_subplot(1,2,1)
-    # ax1.imshow(pred_mask)
-    # ax2 = fig.add_subplot(1,2,2)
-    
-    # ax2.imshow(labels)
-    # plt.show()
+
     for label in range(1,nlabels):
         inds = np.argwhere(labels==label)
         area = inds.shape[0]
@@ -145,7 +146,18 @@ def convexity_loss(pred,gt):
     return cvx_loss
 
 def instance_loss(pred,gt,background_points,instance_weights,imgs):
+    """instance_loss Split loss/instance loss - the loss for making blobs instances
 
+    Arguments:
+        pred {tesnor} -- prediction from model
+        gt {tensor} -- ground truth
+        background_points {tensor} -- ground truth of points in backgrond
+        instance_weights {dictionary} -- weights of instance loss
+        imgs {tensor} -- input images
+
+    Returns:
+        PyTorch cross entropy loss -- split loss
+    """
     # print(f"gt: {gt.shape}, background points: {background_points.shape}")
     points = utils.t2n(gt).copy().squeeze()
     image = np.transpose(utils.t2n(imgs).copy().squeeze(),(1,2,0))
@@ -233,10 +245,6 @@ def instance_loss(pred,gt,background_points,instance_weights,imgs):
         boundaries_imshow = np.ma.masked_where(edges_ws==0,edges_ws)
     # seg[seg==labels_to_ignore] = 0
 
-    # plt.imshow(seg)
-    # plt.show()
-    # counts = counts[counts==True]
-    
     
     eroded_ws_inverse = erosion(ws_inverse,square(6))
     # points_imshow = np.ma.masked_where(points==0,points)
@@ -311,6 +319,18 @@ def instance_loss(pred,gt,background_points,instance_weights,imgs):
     
 
 def count_segment_loss(model,batch,losses_to_use,loss_weights,class_weights):
+    """count_segment_loss overall loss function for Triple-S model
+
+    Arguments:
+        model {nn.Module} -- model
+        batch {batch} -- batch from dataloader iteration
+        losses_to_use {list} -- list of losses to use - TODO: delete since it is not used anymore
+        loss_weights {dictionary} -- dictionary with losses and weigts 
+        class_weights {dictionary} -- dictionary with losses and weights for each class (here we have 2 classes) 
+
+    Returns:
+        loss -- overall loss of the model
+    """
     model.train()
 
     imgs,masks,count = batch
