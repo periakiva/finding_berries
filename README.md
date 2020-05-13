@@ -5,7 +5,7 @@ PyTorch implementation of the paper
 "Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors". 
 Peri Akiva, Kristin Dana, Peter Oudemans, Michael Mars. CVPRW2020. 
 ```
-[This](https://arxiv.org/pdf/2004.08501.pdf "Link") is the link to the paper. This repository also features a docker container setup for training, evaluation and testing. 
+[Link to paper](https://arxiv.org/pdf/2004.08501.pdf "Link") [Link to project site](https://periakiva.github.io/finding_berries/). This repository also features a docker container setup for training, evaluation and testing. 
 
 ## Citing this work
 
