@@ -48,7 +48,7 @@ def labelbox_json_to_csv(path_to_json,points=True,save_images=False,save_path=''
     """
     image_height = 456
     image_width = 608
-    mask_by_link = False
+    mask_by_link = True
     with_occlusion = False
     instance_seg = not mask_by_link
     multi_channel_masks = False
@@ -157,9 +157,9 @@ def labelbox_json_to_csv(path_to_json,points=True,save_images=False,save_path=''
                         image_save_path = save_path + "semantic_seg/without_occlusion/images/"
                         masks_save_path = save_path + "semantic_seg/without_occlusion/masks/"
                     else:
-                        mask[mask>1] = 1
+                        # mask[mask>1] = 1
                         image_save_path = save_path + "semantic_seg/images/"
-                        masks_save_path = save_path + "semantic_seg/masks/"
+                        masks_save_path = save_path + "semantic_seg/masks_255/"
                     combined_image_mask = np.dstack((combined_image_mask,mask))
                     combined_save_path = save_path+"semantic_seg/combined_single_mask/"
                     utils.create_dir_if_doesnt_exist(combined_save_path)
@@ -167,12 +167,12 @@ def labelbox_json_to_csv(path_to_json,points=True,save_images=False,save_path=''
                     combined_image_mask = Image.fromarray(np.uint8(combined_image_mask))
                     image = Image.fromarray(np.uint8(original_image))
                     mask = Image.fromarray(mask)
-                    image.save(f'{image_save_path}count_{count_label_regioms}_{original_image_name}')
+                    # image.save(f'{image_save_path}count_{count_label_regioms}_{original_image_name}')
                     mask.save(f'{masks_save_path}count_{count_label_regioms}_{original_image_name}')
-                    combined_image_mask.save(combined_save_path+original_image_name)
+                    # combined_image_mask.save(combined_save_path+original_image_name)
 
-                    df = df.append({'filename':f"count_{count_label_regioms}_{original_image_name}",'count':count_label_regioms, 
-                                    'region locations':label_regions_cranberry_outline,'locations':label_regions_cranberry_outline_points,'dataset':dataset},ignore_index=True)
+                    # df = df.append({'filename':f"count_{count_label_regioms}_{original_image_name}",'count':count_label_regioms, 
+                    #                 'region locations':label_regions_cranberry_outline,'locations':label_regions_cranberry_outline_points,'dataset':dataset},ignore_index=True)
                 except Exception as e:
                     print("file: {}, error: {}".format(mask_link,e))
             elif instance_seg:

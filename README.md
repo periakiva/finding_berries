@@ -22,7 +22,7 @@ Peri Akiva, Kristin Dana, Peter Oudemans, Michael Mars. CVPRW2020.
 ## Dataset
 We use the CRAID (CRanberry Aerial Imagery Dataset) in our experiments. The dataset can be downloaded from:
 
-  * [CRAID](https://forms.gle/zfFCKy1pyDD4WNro7)
+  * [CRAID](https://forms.gle/gAonKq5PMhmifgxr9)
 
 ## Setting up the environment
 We can set up an environment in 2 ways: locally, or in a docker container.
