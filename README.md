@@ -46,7 +46,9 @@ git clone git@github.com:periakiva/finding_berries.git
 cd finding_berries
 mkdir data
 ```
-###### Download and save data to the data direcotory. The data should be in 2 or 3 directories (depending on functionality): images, masks, back-masks. Generally, only the images and masks directories are necessary where masks have both berry and background points. 
+
+Download and save data to the data direcotory. The data should be in 2 or 3 directories (depending on functionality): images, masks, back-masks. Generally, only the images and masks directories are necessary where masks have both berry and background points. 
+
 ```
 sudo docker build -t finding_berries .
 sudo docker run --gpus all -it -p80:3000 finding_berries
