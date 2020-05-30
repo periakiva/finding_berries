@@ -44,10 +44,16 @@ This project can also be ran in a docker container. First install docker and nvi
 ```
 git clone git@github.com:periakiva/finding_berries.git
 cd finding_berries
+mkdir data
+```
+###### Download and save data to the data direcotory. The data should be in 2 or 3 directories (depending on functionality): images, masks, back-masks. Generally, only the images and masks directories are necessary where masks have both berry and background points. 
+```
 sudo docker build -t finding_berries .
 sudo docker run --gpus all -it -p80:3000 finding_berries
 ```
 Then you can run any of the scripts on the docker container. Note that you will need to set up the config file with respect to which approach you use. Sample config file can be seen below.
+
+In the case you use
 
 ## Usage
 In order to run this code, adjustments should be made to the config file in training and evaluation code. Sample config file:
