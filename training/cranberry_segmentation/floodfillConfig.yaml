@@ -1,11 +1,19 @@
 # Ours
+location: docker #[local, docker]
 data:
-  type: semantic_seg
-  model_save_dir: /home/native/projects/data/cranberry/models/
-  train_dir: /home/native/projects/data/cranberry/points/instance_points/
-  test_dir: /home/native/projects/data/cranberry/semantic_seg/
-  val_dir:
   image_size: 456x608
+  local:
+    type: semantic_seg
+    model_save_dir: /home/native/projects/data/cranberry/models/
+    train_dir: /home/native/projects/data/cranberry/points/instance_points/
+    test_dir: /home/native/projects/data/cranberry/semantic_seg/
+    val_dir:
+  docker:
+    type: semantic_seg
+    model_save_dir: /app/finding_berries/models/
+    train_dir: /app/finding_berries/data/instance_points/
+    test_dir: /app/finding_berries/data/semantic_seg/
+    val_dir:
 
 training: 
   learning_rate: 0.001 #1e-4

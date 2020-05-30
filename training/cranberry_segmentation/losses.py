@@ -169,8 +169,8 @@ def instance_loss(pred,gt,background_points,instance_weights,imgs):
 
     # points[points>0] += 3
     # mode = "both"
-    # mode = "selective"
-    mode = "none"
+    mode = "selective"
+    # mode = "none"
     if mode == "selective":
         points, npoints = ndimage.label(points_with_back)
         label_to_ignore = []
@@ -248,70 +248,70 @@ def instance_loss(pred,gt,background_points,instance_weights,imgs):
     
     eroded_ws_inverse = erosion(ws_inverse,square(6))
     # points_imshow = np.ma.masked_where(points==0,points)
-    visualize = True
-    if visualize:
-        points_cmap = colors.ListedColormap(['blue'])
-        back_points_cmap = colors.ListedColormap(['red'])
-        edges_cmap = colors.ListedColormap(['blue'])
-        cmap = plt.cm.get_cmap('tab20c')
-        cmaplist = [cmap(i) for i in range(cmap.N)]
+    # visualize = True
+    # if visualize:
+    #     points_cmap = colors.ListedColormap(['blue'])
+    #     back_points_cmap = colors.ListedColormap(['red'])
+    #     edges_cmap = colors.ListedColormap(['blue'])
+    #     cmap = plt.cm.get_cmap('tab20c')
+    #     cmaplist = [cmap(i) for i in range(cmap.N)]
         
-        cmaplist = [cmaplist[0],'white']
-        cmap = matplotlib.colors.LinearSegmentedColormap.from_list('Custom cmap', cmaplist, 2)
+    #     cmaplist = [cmaplist[0],'white']
+    #     cmap = matplotlib.colors.LinearSegmentedColormap.from_list('Custom cmap', cmaplist, 2)
         
 
-        if mode == "none":
-            edges_fig = plt.figure()
-            # ax1 = fig.add_subplot(2,2,1)
-            # ax1.imshow(pred_mask)
-            # ax2 = fig.add_subplot(2,2,2)
-            # ax2.imshow(ws_inverse)
-            # ax3 = fig.add_subplot(2,2,3)
-            # ax3.imshow(seg)
-            eroded_watershed = erosion(ws_inverse,square(6))
-            ws_inverse_imshow = np.ma.masked_where(eroded_watershed==0,eroded_watershed)
-            edges_cmap = colors.ListedColormap(['Cyan'])
-            edges = find_boundaries(eroded_watershed,mode='inner')
-            edges_imshow = np.ma.masked_where(edges==0,edges)
+    #     if mode == "none":
+    #         edges_fig = plt.figure()
+    #         # ax1 = fig.add_subplot(2,2,1)
+    #         # ax1.imshow(pred_mask)
+    #         # ax2 = fig.add_subplot(2,2,2)
+    #         # ax2.imshow(ws_inverse)
+    #         # ax3 = fig.add_subplot(2,2,3)
+    #         # ax3.imshow(seg)
+    #         eroded_watershed = erosion(ws_inverse,square(6))
+    #         ws_inverse_imshow = np.ma.masked_where(eroded_watershed==0,eroded_watershed)
+    #         edges_cmap = colors.ListedColormap(['Cyan'])
+    #         edges = find_boundaries(eroded_watershed,mode='inner')
+    #         edges_imshow = np.ma.masked_where(edges==0,edges)
 
-            ax5 = edges_fig.add_subplot(1,1,1)
-            ax5.imshow(image)
-            points = points.squeeze()
-            points_imshow = np.ma.masked_where(points==0,points)
-            ax5.imshow(ws_inverse_imshow,cmap =cmap, alpha = 0.5)
-            ax5.imshow(edges_imshow,cmap=edges_cmap)
-            ax5.imshow(points_imshow,cmap = points_cmap)
-            # ax5.imshow(boundaries_imshow,cmap=edges_cmap)
-            ax5.set_axis_off()
-            edges_fig.savefig(f"/home/native/projects/data/cranberry/visuals/paper/dataset_examples/watershed/watershed_overlaid_c01_{npoints}",dpi=600,bbox_inches='tight')
-            # plt.show()
-            edges_fig.clear()
-            plt.cla()
-            plt.clf()
-            plt.close('all')
-            plt.close(edges_fig)
-        elif mode == "selective":
-            fig = plt.figure()
-            ax4 = fig.add_subplot(1,1,1)
-            edges_cmap = colors.ListedColormap(['Cyan'])
-            edges = find_boundaries(eroded_ws_inverse,mode='inner')
-            edges_imshow = np.ma.masked_where(edges==0,edges)
-            eroded_ws_inverse_imshow = np.ma.masked_where(eroded_ws_inverse==0,eroded_ws_inverse)
-            ax4.imshow(image)
-            # ax4.imshow(eroded_ws_inverse,cmap = cmap)
-            ax4.imshow(eroded_ws_inverse_imshow,cmap = cmap,alpha = 0.6)
-            ax4.imshow(edges_imshow,cmap=edges_cmap)
-            ax4.imshow(points_imshow,cmap=points_cmap)
-            ax4.imshow(background_points_imshow,cmap=back_points_cmap)
-            ax4.set_axis_off()
-            plt.axis('off')
-            # plt.show()
-            fig.savefig(f"/home/native/projects/data/cranberry/visuals/paper/dataset_examples/selective_watershed/selective_watershed_overlaid_c01_{npoints}",dpi=600,bbox_inches='tight')
-            fig.clear()
-            plt.cla()
-            plt.clf()
-            plt.close('all')
-            plt.close(fig)
+    #         ax5 = edges_fig.add_subplot(1,1,1)
+    #         ax5.imshow(image)
+    #         points = points.squeeze()
+    #         points_imshow = np.ma.masked_where(points==0,points)
+    #         ax5.imshow(ws_inverse_imshow,cmap =cmap, alpha = 0.5)
+    #         ax5.imshow(edges_imshow,cmap=edges_cmap)
+    #         ax5.imshow(points_imshow,cmap = points_cmap)
+    #         # ax5.imshow(boundaries_imshow,cmap=edges_cmap)
+    #         ax5.set_axis_off()
+    #         edges_fig.savefig(f"/home/native/projects/data/cranberry/visuals/paper/dataset_examples/watershed/watershed_overlaid_c01_{npoints}",dpi=600,bbox_inches='tight')
+    #         # plt.show()
+    #         edges_fig.clear()
+    #         plt.cla()
+    #         plt.clf()
+    #         plt.close('all')
+    #         plt.close(edges_fig)
+    #     elif mode == "selective":
+    #         fig = plt.figure()
+    #         ax4 = fig.add_subplot(1,1,1)
+    #         edges_cmap = colors.ListedColormap(['Cyan'])
+    #         edges = find_boundaries(eroded_ws_inverse,mode='inner')
+    #         edges_imshow = np.ma.masked_where(edges==0,edges)
+    #         eroded_ws_inverse_imshow = np.ma.masked_where(eroded_ws_inverse==0,eroded_ws_inverse)
+    #         ax4.imshow(image)
+    #         # ax4.imshow(eroded_ws_inverse,cmap = cmap)
+    #         ax4.imshow(eroded_ws_inverse_imshow,cmap = cmap,alpha = 0.6)
+    #         ax4.imshow(edges_imshow,cmap=edges_cmap)
+    #         ax4.imshow(points_imshow,cmap=points_cmap)
+    #         ax4.imshow(background_points_imshow,cmap=back_points_cmap)
+    #         ax4.set_axis_off()
+    #         plt.axis('off')
+    #         # plt.show()
+    #         fig.savefig(f"/home/native/projects/data/cranberry/visuals/paper/dataset_examples/selective_watershed/selective_watershed_overlaid_c01_{npoints}",dpi=600,bbox_inches='tight')
+    #         fig.clear()
+    #         plt.cla()
+    #         plt.clf()
+    #         plt.close('all')
+    #         plt.close(fig)
         
         # fig.savefig(f"/home/native/projects/data/cranberry/visuals/paper/dataset_examples/selective_watershed_c05_{npoints}",dpi=600,bbox_inches='tight')
     

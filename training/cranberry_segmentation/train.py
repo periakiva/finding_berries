@@ -4,7 +4,7 @@ current_path = os.getcwd().split("/")
 if 'projects' in current_path:
     sys.path.append("/home/native/projects/finding_berries/")
 else:
-    sys.path.append("/data/finding_berries/")
+    sys.path.append("/app/finding_berries/")
 
 import gc
 import comet_ml
@@ -242,7 +242,7 @@ class Trainer(object):
         empty_string = "_"
         loss_weights_str = "_".join([str(x)+"_"+str(y) for x,y in self.loss_weights.items()])
         counting_type = self.losses_to_use[-1]
-        model_save_dir = config['data']['model_save_dir']+f"{current_path[-1]}/{cometml_experiment.project_name}_{empty_string.join(self.losses_to_use)}_{loss_weights_str}_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}/"
+        model_save_dir = config['data'][config['location']]['model_save_dir']+f"{current_path[-1]}/{cometml_experiment.project_name}_{empty_string.join(self.losses_to_use)}_{loss_weights_str}_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}/"
         utils.create_dir_if_doesnt_exist(model_save_dir)
         for epoch in range(0,self.epochs):
             with cometml_experiment.train():
@@ -283,23 +283,24 @@ class Trainer(object):
 
 if __name__== "__main__":
 
+
     project_name = f"{current_path[-3]}_{current_path[-1]}"#_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}"
     experiment = comet_ml.Experiment(api_key="9GTK1r9PK4NzMAoLsnC6XxI7p",project_name=project_name,workspace="periakiva")
     
     config_path = utils.dictionary_contents(os.getcwd()+"/",types=["*.yaml"])[0]
     config = utils.config_parser(config_path,experiment_type="training")
     config['start_time'] = datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
-    
+    location = config['location']
     torch.set_default_dtype(torch.float32)
     device_cpu = torch.device('cpu')
     device = torch.device('cuda:0') if config['use_cuda'] else device_cpu
 
     train_dataloader, validation_dataloader, test_dataloader = cranberry_dataset.build_train_validation_loaders(
-                                                                                                                data_dictionary=config['data']['train_dir'],batch_size=config['training']['batch_size'],
-                                                                                                                num_workers=config['training']['num_workers'],type=config['data']['type'],
+                                                                                                                data_dictionary=config['data'][location]['train_dir'],batch_size=config['training']['batch_size'],
+                                                                                                                num_workers=config['training']['num_workers'],type=config['data'][location]['type'],
                                                                                                                 train_val_test_split=config['training']['train_val_test_split']
                                                                                                                 )
-    fs_test_loader = cranberry_dataset.build_single_loader(config['data']['test_dir'],batch_size=1,num_workers=1,test=True)
+    fs_test_loader = cranberry_dataset.build_single_loader(config['data'][location]['test_dir'],batch_size=1,num_workers=1,test=True)
     with peter('Building Network'):
         model = unet_refined.UNetRefined(n_channels=3,n_classes=2)
         # model = unet_regres.Unet(in_channels=3,classes=2,decoder_channels= (512,256,128),encoder_depth=3)

@@ -158,7 +158,7 @@ def filterer(labels,nlabels):
 
 def save_image(img,save_dir,name):
     if type(img).__module__ == np.__name__:
-        PIL = Image.fromarray(numpy_image.astype(np.uint8))
+        PIL = Image.fromarray(img.astype(np.uint8))
     else:
         PIL = img
     

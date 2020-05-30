@@ -311,7 +311,7 @@ class CBDatasetSemanticSeg(Dataset):
 
         self.has_mask = has_mask
         if len(self.image_paths) == 0:
-            raise ValueError("There are no images in {}".format(directory))
+            raise ValueError(f"There are no images in {self.images_path}")
         
 
     def __len__(self):
