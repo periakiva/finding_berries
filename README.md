@@ -37,19 +37,40 @@ conda activate finding_berries
 pip install .
 ```
 
+### Docker
+
+This project can also be ran in a docker container. First install docker and nvidia-docker on your machine ([docker](https://docs.docker.com/get-docker/), [docker-nvidia](https://github.com/NVIDIA/nvidia-docker)). Then:
+
+```
+git clone git@github.com:periakiva/finding_berries.git
+cd finding_berries
+sudo docker build -t finding_berries .
+sudo docker run --gpus all -it -p80:3000 finding_berries
+```
+Then you can run any of the scripts on the docker container. Note that you will need to set up the config file with respect to which approach you use. Sample config file can be seen below.
+
 ## Usage
 In order to run this code, adjustments should be made to the config file in training and evaluation code. Sample config file:
 
 ```
 # Ours
-data:
-  type: semantic_seg # type of dataset to use. [semantic_seg,instance_seg,points]
-  model_save_dir: /path/to/directory/where/model/is/saved
-  train_dir: /path/to/train/data/
-  test_dir: /path/to/test/data/
-  val_dir: /path/to/val/data/
-  image_size: 456x608 # size of image. if image size is different than this, need to train from scratch, and not use pretrained model.
 
+location: docker #[local, docker]
+data:
+  image_size: 456x608 # size of image. if image size is different than this, need to train from scratch, and not use pretrained model.
+  local:
+    type: semantic_seg # type of dataset to use. [semantic_seg,instance_seg,points]
+    model_save_dir: /path/to/directory/where/model/is/saved
+    train_dir: /path/to/train/data/
+    test_dir: /path/to/test/data/
+    val_dir: /path/to/val/data/
+  docker:
+    type: semantic_seg
+    model_save_dir: /app/finding_berries/models/
+    train_dir: /app/finding_berries/data/instance_points/
+    test_dir: /app/finding_berries/data/semantic_seg/
+    val_dir:
+  
 training: 
   learning_rate: 0.001 
   resume: False # if true, insert path to the model to be resumed. Otherwise this will train from scratch
@@ -70,8 +91,6 @@ use_cuda: True
 
 ```
 After config file is modified, simply run the train/evaluate script that is in the same directory. Some paths might be coded into the script, so error may occur. TODO: this should be fixed in the docker approach
-
-### Docker
 
 
 
