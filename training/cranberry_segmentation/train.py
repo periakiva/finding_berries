@@ -284,12 +284,13 @@ class Trainer(object):
 if __name__== "__main__":
 
 
-    project_name = f"{current_path[-3]}_{current_path[-1]}"#_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}"
-    experiment = comet_ml.Experiment(api_key="9GTK1r9PK4NzMAoLsnC6XxI7p",project_name=project_name,workspace="periakiva")
-    
     config_path = utils.dictionary_contents(os.getcwd()+"/",types=["*.yaml"])[0]
     config = utils.config_parser(config_path,experiment_type="training")
     config['start_time'] = datetime.datetime.today().strftime('%Y-%m-%d-%H:%M:%S')
+    
+    project_name = f"{current_path[-3]}_{current_path[-1]}"#_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}"
+    experiment = comet_ml.Experiment(api_key=config['cometml_api_key'],project_name=project_name,workspace="periakiva")
+    
     location = config['location']
     torch.set_default_dtype(torch.float32)
     device_cpu = torch.device('cpu')

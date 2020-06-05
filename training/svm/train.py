@@ -60,7 +60,7 @@ class svmTrainer(object):
 if __name__ == "__main__":
 
     project_name = f"{current_path[-1]}"#_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}"
-    experiment = comet_ml.Experiment(api_key="PpfSm1ARSKc4ybre5WS7oMYO6",project_name=project_name,workspace="periakiva")
+    experiment = comet_ml.Experiment(api_key="apikey",project_name=project_name,workspace="periakiva")
     
     config_path = utils.dictionary_contents(os.getcwd()+"/",types=["*.yaml"])[0]
     config = utils.config_parser(config_path,experiment_type="training")

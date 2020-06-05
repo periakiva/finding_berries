@@ -47,6 +47,7 @@ training:
   # test_with_full_supervision: 0
 
 use_cuda: True
+cometml_api_key: apikey
 lambda:
 threads: 
 no_data_augm:
