@@ -5,18 +5,18 @@ PyTorch implementation of the paper
 "Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors". 
 Peri Akiva, Kristin Dana, Peter Oudemans, Michael Mars. CVPRW2020. 
 ```
-[[Link to paper]](https://arxiv.org/pdf/2004.08501.pdf "Link"),  [[Link to project site]](https://periakiva.github.io/finding_berries/). This repository also features a docker container setup for training, evaluation and testing. 
+[[Link to paper]](http://openaccess.thecvf.com/content_CVPRW_2020/papers/w5/Akiva_Finding_Berries_Segmentation_and_Counting_of_Cranberries_Using_Point_Supervision_CVPRW_2020_paper.pdf "Link"),  [[Link to project site]](https://periakiva.github.io/finding_berries/). This repository also features a docker container setup for training, evaluation and testing. 
 
 ## Citing this work
 
 ```
-@article{akiva2020finding,
-  title={Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors},
-  author={Peri Akiva and Kristin Dana and Peter Oudemans and Michael Mars},
-  journal={Proceedings of the Computer Vision and Pattern Recognition Workshops (CVPRW)},
-  month={June},
-  year={2020}
-}
+@InProceedings{Akiva_2020_CVPR_Workshops,
+author = {Akiva, Peri and Dana, Kristin and Oudemans, Peter and Mars, Michael},
+title = {Finding Berries: Segmentation and Counting of Cranberries Using Point Supervision and Shape Priors},
+booktitle = {The IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR) Workshops},
+month = {June},
+year = {2020}
+} 
 ```
 
 ## Dataset
