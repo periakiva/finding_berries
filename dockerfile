@@ -79,7 +79,7 @@ ADD . finding_berries/
 
 WORKDIR /app/finding_berries/training/cranberry_segmentation/
 
-CMD ["python","train.py"]
+# CMD ["python","train.py"]
 
 EXPOSE 3000
 
