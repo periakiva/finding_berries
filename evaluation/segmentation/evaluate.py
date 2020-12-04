@@ -4,7 +4,7 @@ current_path = os.getcwd().split("/")
 if 'projects' in current_path:
     sys.path.append("/home/native/projects/finding_berries/")
 else:
-    sys.path.append("/data/finding_berries/")
+    sys.path.append("/app/finding_berries/")
 
 import gc
 import comet_ml
