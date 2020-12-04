@@ -77,7 +77,7 @@ RUN pip install peterpy
 
 ADD . finding_berries/
 
-WORKDIR /app/finding_berries/training/cranberry_segmentation/
+WORKDIR /app/finding_berries/
 
 # CMD ["python","train.py"]
 
