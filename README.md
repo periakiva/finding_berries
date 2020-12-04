@@ -45,7 +45,11 @@ This project can also be ran in a docker container. First install docker and nvi
 git clone git@github.com:periakiva/finding_berries.git
 cd finding_berries
 mkdir data
+cd data
+mkdir checkpoints
+wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1Y1FxmQmiypD145I327G8o82EgAL_q2eo' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1Y1FxmQmiypD145I327G8o82EgAL_q2eo" -O floodfill_epoch_43_mean_iou_0.6254406128186686_best_mae_13.459821428571429_mioumao_ratio_4.646722960908185_time_2020-03-09-13:23:56 && rm -rf /tmp/cookies.txt
 ```
+
 
 Download and save data to the data direcotory. The data should be in 2 or 3 directories (depending on functionality): images, masks, back-masks. Generally, only the images and masks directories are necessary where masks have both berry and background points. 
 
