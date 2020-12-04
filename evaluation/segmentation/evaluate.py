@@ -3,8 +3,10 @@ import os
 current_path = os.getcwd().split("/")
 if 'projects' in current_path:
     sys.path.append("/home/native/projects/finding_berries/")
+    location = "local"
 else:
     sys.path.append("/app/finding_berries/")
+    location = "docker"
 
 import gc
 import comet_ml
@@ -281,7 +283,8 @@ class Evaluator(object):
         # print(type(count_metrics[0]))
         _,_,mean_iou,_ = eval_utils.calc_mAP(preds,targets)
         print("Validation mIoU value: {0:1.5f}".format(mean_iou))
-        print(f"Validation Count Regression Mean Average Error: {count_mae}\nRegression Root Mean Squared Error: {count_rmse}\nRegression Mean Absolute Percent Error: {count_mape}\nDetection MAE: {detection_count_mae}\nDetection RMSE: {detection_count_rmse}\n Detection MAPE: {detection_count_mape}")
+        # print(f"Validation Count Regression Mean Average Error: {count_mae}\nRegression Root Mean Squared Error: {count_rmse}\nRegression Mean Absolute Percent Error: {count_mape}")
+        print(f"Detection MAE: {detection_count_mae}\nDetection RMSE: {detection_count_rmse}\n Detection MAPE: {detection_count_mape}")
         # print("Validation average loss: {1:1.2f}".format(total_loss/self.val_loader.__len__()))
         with open("ours_count_pred.yaml",'w') as file:
             yaml.dump(gt_pred_count,file)
@@ -302,15 +305,17 @@ if __name__ == "__main__":
     config_path = utils.dictionary_contents(os.getcwd()+"/",types=["*.yaml"])[0]
     config = utils.config_parser(config_path,experiment_type="training")
 
+    # location = config['location']
     torch.set_default_dtype(torch.float32)
     device_cpu = torch.device('cpu')
     device = torch.device('cuda:0') if config['use_cuda'] else device_cpu
 
     # data_dictionary,batch_size,num_workers,instance_seg = False):
-    test_loader = cranberry_dataset.build_single_loader(data_dictionary = config['data']['eval_dir'],
+    test_loader = cranberry_dataset.build_single_loader(data_dictionary = config['data'][location]['eval_dir'],
                                                         batch_size=config['testing']['batch_size'],
                                                         num_workers=config['testing']['num_workers'],
-                                                        type=config['data']['type'], has_mask = config['data']['has_mask']
+                                                        type=config['data'][location]['type'], 
+                                                        has_mask = config['data'][location]['has_mask']
                                                         )
 
 
@@ -335,20 +340,20 @@ if __name__ == "__main__":
     start_epoch = 0
     lowest_mahd = np.infty
     #TODO: Add resume option to Trainer using below code
-    if config['testing']['resume'] != False:
+    if config['testing'][location]['resume'] != False:
         with peter('Loading checkpoints'):
-            if os.path.isfile(config['testing']['resume']):
+            if os.path.isfile(config['testing'][location]['resume']):
                 # model = torch.load(config['training']['resume'])
-                checkpoint = torch.load(config['testing']['resume'])
+                checkpoint = torch.load(config['testing'][location]['resume'])
                 # print(checkpoint)
                 start_epoch = checkpoint['epoch']
                 model.load_state_dict(checkpoint['model'])
                 optimizer.load_state_dict(checkpoint['optimizer'])
                 # scheduler.load_state_dict(checkpoint['scheduler'])
-                print(f"loaded model from {config['testing']['resume']}")
+                print(f"loaded model from {config['testing'][location]['resume']}")
                 # print("Loaded checkpoint {}, now at epoch: {}".format(config['training']['resume'],checkpoint['epoch']))        
             else:
-                print("no checkpoint found at {}".format(config['testing']['resume']))
+                print("no checkpoint found at {}".format(config['testing'][location]['resume']))
                 exit()
 
 
@@ -359,6 +364,6 @@ if __name__ == "__main__":
 
 
     evalutor = Evaluator(model=model,test_loader = test_loader,
-                        criterion=loss_segmentation,has_mask=config['data']['has_mask'],
+                        criterion=loss_segmentation,has_mask=config['data'][location]['has_mask'],
                         test_with_full_supervision = config['testing']['test_with_full_supervision'])
     evalutor.forward(experiment)

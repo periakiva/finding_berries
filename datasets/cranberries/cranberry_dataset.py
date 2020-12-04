@@ -337,9 +337,9 @@ class CBDatasetSemanticSeg(Dataset):
         if self.transforms is not None:
             collections = list(map(FT.to_pil_image,[image,mask]))
             transformed_img,tranformed_mask = self.transforms(collections)
-            return transformed_img, tranformed_mask,count#, img_path
+            return transformed_img, tranformed_mask,count, img_path
             
-        return image,mask,count #,img_path
+        return image,mask,count,img_path
 
 class CBDatasetInstanceSeg(Dataset):
     def __init__(self,directory,transforms=None,target_transforms=None,test=False,has_mask=True):

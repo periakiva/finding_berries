@@ -3,8 +3,10 @@ import os
 current_path = os.getcwd().split("/")
 if 'projects' in current_path:
     sys.path.append("/home/native/projects/finding_berries/")
+    location = "local"
 else:
     sys.path.append("/app/finding_berries/")
+    location = "docker"
 
 import gc
 import comet_ml
@@ -131,7 +133,7 @@ class Trainer(object):
         losses_dict = {'seg_loss':0.0,'inst_loss':0.0,'cvx_loss':0.0,'circ_loss':0.0,'closs':0.0}
         for batch_index,batch in enumerate(self.train_loader):
 
-            imgs,masks,count = batch
+            imgs,masks,count, _ = batch
             imgs = imgs.to(device)
             masks = masks.to(device).squeeze(1)
             self.optimizer.zero_grad()
@@ -164,7 +166,7 @@ class Trainer(object):
             loader = self.val_loader
         with torch.no_grad():
             for batch_index,batch in enumerate(loader):
-                imgs,masks,count = batch
+                imgs,masks,count, _ = batch
 
                 imgs = imgs.to(device)
                 masks = masks.to(device).squeeze(1)
@@ -291,7 +293,7 @@ if __name__== "__main__":
     project_name = f"{current_path[-3]}_{current_path[-1]}"#_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}"
     experiment = comet_ml.Experiment(api_key=config['cometml_api_key'],project_name=project_name,workspace="periakiva")
     
-    location = config['location']
+    # location = config['location']
     torch.set_default_dtype(torch.float32)
     device_cpu = torch.device('cpu')
     device = torch.device('cuda:0') if config['use_cuda'] else device_cpu
