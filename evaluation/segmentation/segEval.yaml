@@ -27,7 +27,7 @@ testing:
   num_workers: 1
   test_with_full_supervision: 1
   docker:
-    resume: /app/finding_berries/data/checkpoints/training_floodfill_instance_count_count_detect_seg_3.0_instance_3.0_convexity_10.0_circularity_10.0_count_0.2_2020-03-09-10:03 - baseline/floodfill_epoch_43_mean_iou_0.6254406128186686_best_mae_13.459821428571429_mioumao_ratio_4.646722960908185_time_2020-03-09-13:23:56.pth
+    resume: /app/finding_berries/data/checkpoints/floodfill_epoch_43_mean_iou_0.6254406128186686_best_mae_13.459821428571429_mioumao_ratio_4.646722960908185_time_2020-03-09-13:23:56.pth
   local:
     resume: /home/native/projects/data/cranberry/models/floodfill/training_floodfill_instance_count_count_detect_seg_3.0_instance_3.0_convexity_10.0_circularity_10.0_count_0.2_2020-03-09-10:03 - baseline/floodfill_epoch_43_mean_iou_0.6254406128186686_best_mae_13.459821428571429_mioumao_ratio_4.646722960908185_time_2020-03-09-13:23:56.pth
 
