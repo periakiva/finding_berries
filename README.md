@@ -47,6 +47,7 @@ cd finding_berries
 mkdir data
 cd data
 mkdir checkpoints
+cd checkpoints
 wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate 'https://docs.google.com/uc?export=download&id=1Y1FxmQmiypD145I327G8o82EgAL_q2eo' -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=1Y1FxmQmiypD145I327G8o82EgAL_q2eo" -O floodfill_epoch_43_mean_iou_0.6254406128186686_best_mae_13.459821428571429_mioumao_ratio_4.646722960908185_time_2020-03-09-13:23:56.pth && rm -rf /tmp/cookies.txt
 ```
 
