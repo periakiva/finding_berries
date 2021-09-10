@@ -22,7 +22,7 @@ year = {2020}
 ## Dataset
 We use the CRAID (CRanberry Aerial Imagery Dataset) in our experiments. The dataset can be downloaded from:
 
-  * [CRAID](https://forms.gle/gAonKq5PMhmifgxr9)
+  * [CRAID](https://rutgersconnect.sharepoint.com/:f:/s/njaes-factberrycounting/Eq13d7duyPJGtWBcIR5NyDcBMhyBq7eLBjrcQ45YWVwSAQ?e=FvLPzz)
 
 ## Setting up the environment
 We can set up an environment in 2 ways: locally, or in a docker container.
