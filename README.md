@@ -25,7 +25,7 @@ We use the CRAID (CRanberry Aerial Imagery Dataset) in our experiments. The data
   * [CRAID](https://rutgersconnect.sharepoint.com/:f:/s/njaes-factberrycounting/Eq13d7duyPJGtWBcIR5NyDcBMhyBq7eLBjrcQ45YWVwSAQ?e=FvLPzz)
 
 ## Setting up the environment
-We can set up an environment in 2 ways: locally, or in a docker container.
+We can set up an environment in 2 ways: locally, or in a docker container. 
 
 ### Locally
 
@@ -110,6 +110,7 @@ After config file is modified, simply run the train/evaluate script that is in t
 
 #### Requirements:
 
+CUDA 10.0 and above
 ```
 ballpark=1.4.0
 imageio=2.6.1
