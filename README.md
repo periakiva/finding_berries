@@ -111,6 +111,7 @@ After config file is modified, simply run the train/evaluate script that is in t
 #### Requirements:
 
 CUDA 10.0 and above
+Ubuntu 16.04 and above
 ```
 ballpark=1.4.0
 imageio=2.6.1
