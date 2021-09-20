@@ -34,7 +34,6 @@ We use Python 3.6. We recommend using Anaconda ([Available here](https://www.ana
 ```
 conda create --name finding_berries --file environment.yml
 conda activate finding_berries
-pip install .
 ```
 
 ### Docker
