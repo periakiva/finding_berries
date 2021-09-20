@@ -32,7 +32,7 @@ We can set up an environment in 2 ways: locally, or in a docker container.
 We use Python 3.6. We recommend using Anaconda ([Available here](https://www.anaconda.com/)) to manage and install libraries. Once anaconda is installed, run those commands:
 
 ```
-conda create --name finding_berries --file environment.txt
+conda create --name finding_berries --file environment.yml
 conda activate finding_berries
 pip install .
 ```
