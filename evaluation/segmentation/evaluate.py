@@ -302,7 +302,7 @@ if __name__ == "__main__":
     project_name = f"{current_path[-3]}_{current_path[-1]}"#_{datetime.datetime.today().strftime('%Y-%m-%d-%H:%M')}"
     experiment = comet_ml.Experiment(api_key="9GTK1r9PK4NzMAoLsnC6XxI7p",project_name=project_name,workspace="periakiva")
     
-    config_path = utils.dictionary_contents(os.getcwd()+"/",types=["*.yaml"])[0]
+    config_path = utils.dictionary_contents(os.getcwd()+"/",types=["*.yaml"])[-1]
     config = utils.config_parser(config_path,experiment_type="training")
 
     # location = config['location']
