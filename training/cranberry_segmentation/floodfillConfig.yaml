@@ -1,5 +1,5 @@
 # Ours
-location: docker #[local, docker]
+location: local #[local, docker]
 data:
   image_size: 456x608
   local:

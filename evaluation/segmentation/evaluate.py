@@ -308,7 +308,7 @@ if __name__ == "__main__":
     # location = config['location']
     torch.set_default_dtype(torch.float32)
     device_cpu = torch.device('cpu')
-    device = torch.device('cuda:0') if config['use_cuda'] else device_cpu
+    device = torch.device('cuda') if config['use_cuda'] else device_cpu
 
     # data_dictionary,batch_size,num_workers,instance_seg = False):
     test_loader = cranberry_dataset.build_single_loader(data_dictionary = config['data'][location]['eval_dir'],
@@ -324,10 +324,11 @@ if __name__ == "__main__":
         # model = unet_regres.Unet(in_channels=3,classes=2,decoder_channels= (512,256,128),encoder_depth=3)
         num_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         print("model has {} trainable parameters".format(num_params))
-    # model = nn.DataParallel(model)
     model.to(device)
-    model.cuda()
+    # model.cuda()
+    # model = nn.DataParallel(model)
     
+    # print("model on GPU")
 
     class_weights = torch.Tensor((1,1)).float()
     class_weights = class_weights.to(device)
