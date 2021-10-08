@@ -1,6 +1,6 @@
 # Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors
 
-PyTorch implementation of the paper 
+PyTorch implementation of the paper. (**09/22/2021**: Important to note that this code is quite old at this point, and may have conflicts and/or dependencies of older CUDA versions. I made a recent update to the code which runs successfuly on an RTX3090, CUDA 11.1, PyTorch 3.9, however experiences may vary)
 ```
 "Finding Berries: Segmentation and Counting of Cranberries using Point Supervision and Shape Priors". 
 Peri Akiva, Kristin Dana, Peter Oudemans, Michael Mars. CVPRW2020. 
