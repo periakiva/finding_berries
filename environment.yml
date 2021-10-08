@@ -121,7 +121,7 @@ dependencies:
     - ftfy==6.0.3
     - funcy==1.16
     - future==0.18.2
-    - gdal==3.4.0
+    - gdal==3.3.2
     - geojson==2.5.0
     - geomet==0.3.0
     - geopandas==0.9.0
