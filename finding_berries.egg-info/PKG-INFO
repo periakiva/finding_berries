@@ -1,0 +1,23 @@
+Metadata-Version: 2.1
+Name: finding-berries
+Version: 0.0.1
+Summary: UNKNOWN
+Home-page: https://github.com/periakiva/finding_berries.git
+Author: Peri Akiva
+Author-email: peri.akiva@rutgers.edu
+License: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 2 - Pre-Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Natural Language :: English
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.5
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Requires-Python: >=3.5
+Description-Content-Type: text/x-rst
+License-File: LICENSE
+
+UNKNOWN
+
