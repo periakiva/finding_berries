@@ -15,20 +15,13 @@ import torch
 from scipy import ndimage
 import torch.optim as optim
 from torch import nn
-import torchvision as tv
-from torchvision.models import inception_v3
-from torchvision import transforms
-from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 from models import unet, loss, unet_refined
-from models.unet_regression import unet_regres
 from peterpy import peter
-from datasets.cranberries import cranberry_dataset
+from datasets import cranberry_dataset
 import numpy as np
 from tqdm import tqdm
 import utils.eval_utils as eval_utils
-import datetime
-from skimage.morphology import watershed
 from skimage.segmentation import find_boundaries
 from skimage import morphology
 from matplotlib import colors

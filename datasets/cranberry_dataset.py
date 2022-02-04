@@ -33,10 +33,7 @@ import random
 import cv2
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches
-torch.manual_seed(1)
-torch.cuda.manual_seed(1)
-np.random.seed(1)
-random.seed(1)
+
 torch.backends.cudnn.deterministic = True
 IMG_EXTENSIONS = ['*.png', '*.jpeg', '*.jpg','*.npy']
 
