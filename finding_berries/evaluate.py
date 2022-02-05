@@ -14,12 +14,14 @@ from peterpy import peter
 from finding_berries.datasets import cranberry_dataset
 import numpy as np
 from tqdm import tqdm
+from finding_berries.datasets import build_dataset
 import finding_berries.utils.eval_utils as eval_utils
 from skimage.segmentation import find_boundaries
 from skimage import morphology
 from matplotlib import colors
 import warnings
 import yaml
+import torchvision
 warnings.filterwarnings('ignore')
 current_path = os.getcwd().split("/")
 
@@ -241,7 +243,7 @@ class Evaluator(object):
                         # plt.close('all')
                         # plt.close(figure)
                         # gc.collect()
-                gt_pred_count[img_path] = (count_by_detection,count.item())
+                # gt_pred_count[img_path] = (count_by_detection, count.item())
                 masks = masks.squeeze_(0).cpu().numpy()
                 preds.append(pred)
                 targets.append(masks)
@@ -266,8 +268,8 @@ class Evaluator(object):
         # print(f"Validation Count Regression Mean Average Error: {count_mae}\nRegression Root Mean Squared Error: {count_rmse}\nRegression Mean Absolute Percent Error: {count_mape}")
         print(f"Detection MAE: {detection_count_mae}\nDetection RMSE: {detection_count_rmse}\n Detection MAPE: {detection_count_mape}")
         # print("Validation average loss: {1:1.2f}".format(total_loss/self.val_loader.__len__()))
-        with open("ours_count_pred.yaml",'w') as file:
-            yaml.dump(gt_pred_count,file)
+        # with open("ours_count_pred.yaml",'w') as file:
+        #     yaml.dump(gt_pred_count,file)
         return
         # return total_loss/self.val_loader.__len__(), mean_iou,count_metrics
 
@@ -291,13 +293,31 @@ if __name__ == "__main__":
     device_cpu = torch.device('cpu')
     device = torch.device('cuda') if config['use_cuda'] else device_cpu
 
+    mean_std = [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]]
+    
+    # [transforms.ToTensor(), None],
+    # [transforms.Normalize(*mean_std), None],
+    # [utils.ToFloat(),  utils.ToLong() ]
+    
+    test_transform = torchvision.transforms.Compose([
+                    torchvision.transforms.ToTensor(),
+                    torchvision.transforms.Normalize(*mean_std)
+                    ])
+    
     # data_dictionary,batch_size,num_workers,instance_seg = False):
-    test_loader = cranberry_dataset.build_single_loader(data_dictionary = config['data'][config['location']]['eval_dir'],
-                                                        batch_size=config['testing']['batch_size'],
-                                                        num_workers=config['testing']['num_workers'],
-                                                        type=config['data'][config['location']]['type'], 
-                                                        has_mask = config['data'][config['location']]['has_mask']
-                                                        )
+    # test_loader = cranberry_dataset.build_single_loader(data_dictionary = config['data'][config['location']]['eval_dir'],
+    #                                                     batch_size=config['testing']['batch_size'],
+    #                                                     num_workers=config['testing']['num_workers'],
+    #                                                     type=config['data'][config['location']]['type'], 
+    #                                                     has_mask = config['data'][config['location']]['has_mask']
+    #                                                     )
+    
+    test_loader = build_dataset(dataset_name='craid', 
+                                root=config['data'][config['location']]['eval_dir'], 
+                                batch_size=config['testing']['batch_size'],
+                                num_workers=config['testing']['num_workers'], 
+                                split="test", 
+                                transforms=test_transform)
 
 
     with peter('Building Network'):

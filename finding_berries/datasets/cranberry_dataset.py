@@ -47,10 +47,7 @@ def build_single_loader(data_dictionary,batch_size,num_workers,type = False,test
                         [utils.ToFloat(),  utils.ToLong() ]
                         ])
 
-    if type == "instance_seg":
-        test_dataset = CBDatasetInstanceSeg(directory=data_dictionary,transforms=transformer,target_transforms=transformer,test=test,has_mask=has_mask)
-    else:
-        test_dataset = CBDatasetSemanticSeg(directory=data_dictionary,transforms=transformer,target_transforms=transformer,test=test,has_mask=has_mask)
+    test_dataset = CBDatasetSemanticSeg(directory=data_dictionary,transforms=transformer,target_transforms=transformer,test=test,has_mask=has_mask)
     test_dataloader = torch.utils.data.DataLoader(test_dataset, batch_size = batch_size,shuffle=False,num_workers=num_workers)
     return test_dataloader
 
@@ -70,14 +67,7 @@ def build_train_validation_loaders(data_dictionary,batch_size,num_workers,type =
                         [utils.ToFloat(),  utils.ToLong() ]
                         ])
 
-    if type.lower() == 'instance_seg':
-        dataset = CBDatasetInstanceSeg(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
-    elif type.lower() == 'points':
-        dataset = CBDatasetPoints(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
-    elif type.lower() == 'points_expand':
-        dataset = CBDatasetPointsPixelExpansion(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
-    elif type.lower() == 'semantic_seg':
-        dataset = CBDatasetSemanticSeg(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
+    dataset = CBDatasetSemanticSeg(directory = data_dictionary, transforms=transformer,target_transforms=transformer)
     data_dictionary = data_dictionary + "/images/"
     train_size = math.ceil(int(len(utils.dictionary_contents(data_dictionary,types=IMG_EXTENSIONS)))*train_val_test_split[0])
     val_size = math.floor(int(len(utils.dictionary_contents(data_dictionary,types=IMG_EXTENSIONS)))*train_val_test_split[1])
@@ -106,51 +96,67 @@ def build_train_validation_loaders(data_dictionary,batch_size,num_workers,type =
 
 
 class CBDatasetSemanticSeg(Dataset):
-    def __init__(self,directory,transforms=None,target_transforms=None,test=False,has_mask=True):
+    def __init__(self, root: str, transforms: object, split: str):
         """CBDataset: Cranberry Dataset.
         The sample images of this dataset must be all inside one directory.
 
         :param directory: Directory with all the images and the CSV file.
         :param transform: Transform to be applied to each image.
-        :param test: if this dataset is to be tested
-        :param has_mask: if the data has masks
- 
+
         """
 
         self.transforms = transforms
-        self.target_transforms = target_transforms
-        self.root_dir = directory
-        self.full_supervision = True
-        self.images_path = self.root_dir + "images/"
-        self.masks_path = self.root_dir + "masks/"
+        self.root_dir = root
+        self.split = split
+        self.images_root = self.root_dir + "images/"
 
-        self.image_paths = sorted(utils.dictionary_contents(self.images_path,types=IMG_EXTENSIONS))
-        self.mask_paths = sorted(utils.dictionary_contents(self.masks_path,types=IMG_EXTENSIONS))
+        self.image_paths = utils.dictionary_contents(self.images_root, types=IMG_EXTENSIONS)
 
-        self.test = test
-        if not self.test and not self.full_supervision:
-            self.back_masks_path = self.root_dir + "back_masks/"
-            self.back_mask_paths = sorted(utils.dictionary_contents(self.back_masks_path,types=IMG_EXTENSIONS))
-
-        self.has_mask = has_mask
+        if split=="train":
+            self.points_root = f"{self.root_dir}/{split}/PointsClass/"
+            self.masks_paths = utils.dictionary_contents(path=self.points_root, types=['*.png'])
+                
+        elif split == "val":
+            self.masks_root = f"{self.root_dir}/{split}/SegmentationClass/"
+            self.masks_paths = utils.dictionary_contents(path=self.masks_root, types=['*.png'])
+        
+        elif split == "test":
+            self.masks_root = f"{self.root_dir}/{split}/SegmentationClass/"
+            self.masks_paths = utils.dictionary_contents(path=self.masks_root, types=['*.png'])
+        
         if len(self.image_paths) == 0:
-            raise ValueError(f"There are no images in {self.images_path}")
+            raise ValueError(f"There are no images in {self.image_paths}")
         
 
     def __len__(self):
-        return len(self.image_paths)
+        if self.split == "val" or self.split == "test":
+            return len(self.masks_paths)
+        elif self.split == "train":
+            return len(self.points_masks)
 
-    def __getitem__(self,index):
-        img_path = self.image_paths[index]
-        mask_path = self.mask_paths[index]
+    def __getitem__(self, index):
+        
+        if self.split == "train":
+            points_mask_path = self.points_masks[index]
+            image_name = points_mask_path.split("/")[-1].split(".")[0]
+            img_path = f"{self.images_root}{image_name}.png"
+            image = Image.open(img_path).convert("RGB")
+            points_mask = Image.open(points_mask_path)#.convert("L")
+
+        elif self.split == "val" or self.split == "test":
+            mask_path = self.masks_paths[index]
+            image_name = mask_path.split("/")[-1].split(".")[0]
+            img_path = f"{self.images_root}{image_name}.png"
+            mask = Image.open(mask_path)
+            image = Image.open(img_path).convert("RGB")
         
         count = int(img_path.split("/")[-1].split("_")[1])
-        image = np.array(Image.open(img_path).convert("RGB"))
+        image = np.array(image)
+        mask = np.array(mask)
         # 0 encoding non-damaged is supposed to be 1 for training.
         # In training, 0 is of background
-        mask = Image.open(mask_path)#.convert("L")
-        mask = np.array(mask)
-        if not self.test and not self.full_supervision:
+        # mask = Image.open(mask_path)#.convert("L")
+        if self.split == "train":
             back_mask_path = self.back_mask_paths[index]
             back_mask = Image.open(back_mask_path)
             back_mask = np.array(back_mask)
@@ -158,8 +164,10 @@ class CBDatasetSemanticSeg(Dataset):
             mask = mask + back_mask
 
         if self.transforms is not None:
-            collections = list(map(FT.to_pil_image,[image,mask]))
-            transformed_img,tranformed_mask = self.transforms(collections)
-            return transformed_img, tranformed_mask,count, img_path
+            # collections = list(map(FT.to_pil_image,[image,mask]))
+            image = self.transforms(image)
+            mask = FT.to_tensor(mask)
+            # transformed_img, tranformed_mask = self.transforms(collections)
+            return image, mask, count, img_path
             
-        return image,mask,count,img_path
+        return image, mask, count, img_path

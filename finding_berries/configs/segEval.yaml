@@ -6,13 +6,13 @@ data:
     type: semantic_seg
     model_save_dir: /home/native/projects/data/cranberry/models/
     model_name: /home/native/projects/data/cranberry/models/cranberry_segmentation/cranberry_counting_cranberry_segmentation_2020-02-04-13:43/cranberry_segmentation_epoch_92_mAP_0.8028254846226599_time_2020-02-04-13:43:02.pth
-    eval_dir: /home/native/projects/data/cranberry/semantic_seg/
+    eval_dir: /media/native/data/data/CRAID1/
     has_mask: True
     val_dir:
   docker:
     type: semantic_seg
     model_save_dir: /app/finding_berries/models/
-    eval_dir: /app/finding_berries/data/semantic_seg/
+    eval_dir: /app/finding_berries/data/
     has_mask: True
     val_dir:
 
