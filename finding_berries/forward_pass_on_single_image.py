@@ -6,8 +6,6 @@ import torch.optim as optim
 from finding_berries.models import unet_refined
 from peterpy import peter
 import numpy as np
-from finding_berries.datasets import build_dataset
-import finding_berries.utils.eval_utils as eval_utils
 import warnings
 import torchvision
 import argparse
@@ -17,12 +15,12 @@ from skimage.segmentation import find_boundaries
 
 import matplotlib.pyplot as plt
 from matplotlib import colors
+
 warnings.filterwarnings('ignore')
 current_path = os.getcwd().split("/")
 
 class SingleEvaluator(object):
     def __init__(self, model: torch.nn.Module) -> None:
-
         self.model = model
 
     def count_from_prediction(self, prediction: torch.Tensor) -> torch.Tensor:
@@ -43,9 +41,9 @@ class SingleEvaluator(object):
 
 
     def evaluate_single(self, image):
+        
         self.model.eval()
         print("testing")
-    
         
         with torch.no_grad():
             
@@ -88,15 +86,9 @@ class SingleEvaluator(object):
             figure.suptitle(f"Application of Triple-S on User Defined Image.\nPredicted number of cranberries: {count_by_detection}")
             
             plt.show()
-            
-            
-            
-
         return
 
 if __name__ == "__main__":
-    
-    
     
     main_config_path = f"{os.getcwd()}/configs/segEval.yaml"
     config = utils.load_yaml_as_dict(main_config_path)
@@ -117,12 +109,6 @@ if __name__ == "__main__":
     image_path = args.image_path
     image = Image.open(image_path).convert("RGB")
     image = test_transform(image).unsqueeze_(0)
-    # test_loader = build_dataset(dataset_name='craid', 
-    #                             root=config['data'][config['location']]['eval_dir'], 
-    #                             batch_size=config['testing']['batch_size'],
-    #                             num_workers=config['testing']['num_workers'], 
-    #                             split="test", 
-    #                             transforms=test_transform)
 
     with peter('Building Network'):
         model = unet_refined.UNetRefined(n_channels=3,n_classes=2)
@@ -148,7 +134,6 @@ if __name__ == "__main__":
             else:
                 print("no checkpoint found at {}".format(config['testing'][config['location']]['resume']))
                 exit()
-
 
     evalutor = SingleEvaluator(model=model)
     evalutor.evaluate_single(image)
