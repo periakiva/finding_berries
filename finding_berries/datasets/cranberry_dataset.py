@@ -96,7 +96,7 @@ def build_train_validation_loaders(data_dictionary,batch_size,num_workers,type =
 
 
 class CBDatasetSemanticSeg(Dataset):
-    def __init__(self, root: str, transforms: object, split: str):
+    def __init__(self, root: str, transforms: object, split: str, **kwargs):
         """CBDataset: Cranberry Dataset.
         The sample images of this dataset must be all inside one directory.
 
@@ -114,7 +114,7 @@ class CBDatasetSemanticSeg(Dataset):
 
         if split=="train":
             self.points_root = f"{self.root_dir}/{split}/PointsClass/"
-            self.masks_paths = utils.dictionary_contents(path=self.points_root, types=['*.png'])
+            self.points_masks = utils.dictionary_contents(path=self.points_root, types=['*.png'])
                 
         elif split == "val":
             self.masks_root = f"{self.root_dir}/{split}/SegmentationClass/"
@@ -141,7 +141,7 @@ class CBDatasetSemanticSeg(Dataset):
             image_name = points_mask_path.split("/")[-1].split(".")[0]
             img_path = f"{self.images_root}{image_name}.png"
             image = Image.open(img_path).convert("RGB")
-            points_mask = Image.open(points_mask_path)#.convert("L")
+            mask = Image.open(points_mask_path)#.convert("L")
 
         elif self.split == "val" or self.split == "test":
             mask_path = self.masks_paths[index]
@@ -156,12 +156,12 @@ class CBDatasetSemanticSeg(Dataset):
         # 0 encoding non-damaged is supposed to be 1 for training.
         # In training, 0 is of background
         # mask = Image.open(mask_path)#.convert("L")
-        if self.split == "train":
-            back_mask_path = self.back_mask_paths[index]
-            back_mask = Image.open(back_mask_path)
-            back_mask = np.array(back_mask)
-            back_mask[back_mask==1] = 2
-            mask = mask + back_mask
+        # if self.split == "train":
+        #     back_mask_path = self.back_mask_paths[index]
+        #     back_mask = Image.open(back_mask_path)
+        #     back_mask = np.array(back_mask)
+        #     back_mask[back_mask==1] = 2
+        #     mask = mask + back_mask
 
         if self.transforms is not None:
             # collections = list(map(FT.to_pil_image,[image,mask]))

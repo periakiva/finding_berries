@@ -2,14 +2,16 @@
 location: local #[local, docker, server]
 data:
   image_size: 456x608
+  name: craid
+  type: semantic_seg
+  num_classes: 2
+  normalization: [[0.485, 0.456, 0.406], [0.229, 0.224, 0.225]]
   local:
-    type: semantic_seg
     model_save_dir: /home/native/projects/data/cranberry/models/
-    train_dir: /home/native/projects/data/cranberry/points/instance_points/
-    test_dir: /home/native/projects/data/cranberry/semantic_seg/
+    train_dir: /media/native/data/data/CRAID1/
+    test_dir: /media/native/data/data/CRAID1/
     val_dir:
   docker:
-    type: semantic_seg
     model_save_dir: /app/finding_berries/models/
     train_dir: /app/finding_berries/data/instance_points/
     test_dir: /app/finding_berries/data/semantic_seg/
@@ -25,26 +27,10 @@ training:
   drop_last_batch:
   optimizer:
   num_workers: 1
-  # loss_weights: {seg: 0.03, instance: 0.5, convexity: 100.0, circularity: 1.0, count: 1000.0}
   loss_weights: {seg: 3.0, instance: 3.0, convexity: 10.0, circularity: 10.0, count: 0.2}
   class_weights: {seg: [1,3000,'mean'], instance: [60,1,'mean']}
-  # losses_to_use: ["count"]
-  # losses_to_use: ["insatnce"]
-  # losses_to_use: ["instance","count_detect"]
-  # losses_to_use: ["instance","count", "count_detect"]
-  # losses_to_use: ["instance","count", "count_regress"]
-  # losses_to_use: ["instance","circularity","count", "count_detect"]
-  losses_to_use: ["instance","circularity", "count_detect"]
-  # losses_to_use: ["instance","convexity","count_detect"]
-  # losses_to_use: ["instance","convexity","count","count_detect"]
-  # losses_to_use: ["instance","circularity","convexity","count_detect"]
-  # losses_to_use: ["circularity","count"]
-  # losses_to_use: ["convexity","count"]
-  # losses_to_use: ["convexity"]
-  # losses_to_use: ["circularity","convexity","count"]
-  # losses_to_use: ["count_detect"]
+  losses_to_use: ["instance", "convexity"] #["instance", "circularity", "count", "count_detect", "count_regress", "convexity"]
   test_with_full_supervision: 1
-  # test_with_full_supervision: 0
 
 use_cuda: True
 cometml_api_key: apikey

@@ -1,7 +1,9 @@
 import torch
 import torch.nn.functional as F
 import numpy as np 
-from skimage.morphology import watershed, erosion
+# from skimage.morphology import watershed, erosion
+from skimage.morphology import erosion
+from skimage.segmentation import watershed
 from skimage.segmentation import find_boundaries
 from skimage.morphology import square
 from skimage import morphology
@@ -39,12 +41,11 @@ def regression_based_count_loss(count_estimation,gt_count):
     # print(f"closs: {closs}, gt: {gt_count_float}, predicted: {count_estimation_float}")
     return closs
 
-def circularity_loss(pred,gt):
+def circularity_loss(pred):
     """circularity_loss calculates and outputs the circularity loss
 
     Arguments:
         pred {tensor} -- prediction from model
-        gt {tensor} -- ground truth tensor
 
     Returns:
         PyTorch huber loss -- circularity loss
@@ -96,12 +97,11 @@ def circularity_loss(pred,gt):
     circ_loss = F.smooth_l1_loss(torch.Tensor(circularity_pred),torch.Tensor(circularity_target))
     return circ_loss
 
-def convexity_loss(pred,gt):
+def convexity_loss(pred):
     """convexity_loss calculates and outputs the convexity loss
 
     Arguments:
         pred {tensor} -- prediction from model
-        gt {tensor} -- ground truth
 
     Returns:
         PyTorch Huber loss -- regression loss over convexity
@@ -333,7 +333,7 @@ def count_segment_loss(model,batch,losses_to_use,loss_weights,class_weights):
     """
     model.train()
 
-    imgs,masks,count = batch
+    imgs, masks, count, image_path = batch
     background_points = masks.clone()
     background_points[background_points==1] = 0
     # print(background_points.shape)
@@ -351,30 +351,30 @@ def count_segment_loss(model,batch,losses_to_use,loss_weights,class_weights):
     # count_estimation = count_estimation.view(-1)
 
     loss_dict = {}
-    seg_loss = loss_weights["seg"]*segmentation_loss(output,masks,seg_weights)
+    seg_loss = loss_weights["seg"]*segmentation_loss(output, masks, seg_weights)
     loss_dict["seg_loss"] = seg_loss
     loss +=seg_loss
     # print(f"before: {loss}, seg_loss: {loss_dict['seg_loss']}")
     if "instance" in losses_to_use:
         # inst_loss = loss_weights[0]*instance_loss(output,masks)
-        inst_loss = loss_weights["instance"]*instance_loss(output,masks,background_points,instance_weights,imgs)
+        inst_loss = loss_weights["instance"]*instance_loss(output, masks, background_points, instance_weights, imgs)
         loss_dict["inst_loss"] = inst_loss
         loss += inst_loss
     if "convexity" in losses_to_use:
         # cvx_loss = loss_weights[1]*convexity_loss(output,masks)
-        cvx_loss = loss_weights["convexity"]*convexity_loss(output,masks)
+        cvx_loss = loss_weights["convexity"]*convexity_loss(output)
         loss_dict["cvx_loss"] = cvx_loss
         loss += cvx_loss
     if "circularity" in losses_to_use:
         # circ_loss = loss_weights[2]*circularity_loss(output,masks)
-        circ_loss = loss_weights["circularity"]*circularity_loss(output,masks)
+        circ_loss = loss_weights["circularity"]*circularity_loss(output)
         loss_dict["circ_loss"] = circ_loss
         loss += circ_loss
     if "count" in losses_to_use:
         if "count_regress" in losses_to_use:
-            closs = loss_weights["count"]*regression_based_count_loss(count_estimation,count)
+            closs = loss_weights["count"]*regression_based_count_loss(count_estimation, count)
         elif "count_detect" in losses_to_use:
-            closs = loss_weights["count"]*detection_based_count_loss(output,count)
+            closs = loss_weights["count"]*detection_based_count_loss(output, count)
         loss_dict["closs"] = closs
         loss +=closs
     # print(f"after: {loss}, seg_loss: {loss_dict['seg_loss']}")

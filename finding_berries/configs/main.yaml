@@ -1,0 +1,27 @@
+dataset: craid
+use_cuda: True
+seed: 128
+
+visualization:
+  batch_index_to_show: 0
+  train_visualizer: True
+  val_visualizer: True
+  visualize_training_every: 2
+  visualize_val_every: 2
+  train_visualization_divisor: 500
+  val_visualization_divisor: 10000
+  save_individual_plots: False
+  save_individual_plots_train: False
+  train_imshow: False
+  val_imshow: False
+  titles: False
+  fg_alpha: 0.7
+  bg_alpha: 0.8
+  font_size: 8
+  fig_size: 25
+  dpi: 100
+  figure_save_root: /media/native/Elements/data/my_papers/ECCV22_single_stage_weakly_supervised_semantic_segmentation/results/
+
+cometml:
+  api_key: qFkg8fMjG0WuuIOYsbsD8dClh
+  workspace: periakiva
