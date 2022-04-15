@@ -8,7 +8,6 @@ else:
 
 import gc
 import comet_ml
-import utils.utils as utils
 import torch
 from scipy import ndimage
 import torch.optim as optim
@@ -18,20 +17,34 @@ from torchvision.models import inception_v3
 from torchvision import transforms
 from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
-from models import unet, loss, unet_refined
-from models.unet_regression import unet_regres
 from peterpy import peter
-from datasets import cranberry_dataset
 import numpy as np
 from tqdm import tqdm
-import utils.eval_utils as eval_utils
 import datetime
-from skimage.morphology import watershed
+import yaml
+# import losses
+
+
+import finding_berries.utils.utils as utils
+import torch
+from scipy import ndimage
+import torch.optim as optim
+from torch import nn
+import matplotlib.pyplot as plt
+from finding_berries.models import unet, loss, unet_refined
+from peterpy import peter
+from finding_berries.datasets import cranberry_dataset
+import numpy as np
+from tqdm import tqdm
+from finding_berries.datasets import build_dataset
+import finding_berries.utils.eval_utils as eval_utils
 from skimage.segmentation import find_boundaries
 from skimage import morphology
+from matplotlib import colors
 import warnings
 import yaml
-import losses
+import torchvision
+
 warnings.filterwarnings('ignore')
 
 class Evaluator(object):
@@ -199,13 +212,24 @@ if __name__ == "__main__":
     device = torch.device('cuda:0') if config['use_cuda'] else device_cpu
 
     # data_dictionary,batch_size,num_workers,instance_seg = False):
-    test_loader = cranberry_dataset.build_single_loader(data_dictionary = config['data']['eval_dir'],
-                                                        batch_size=config['testing']['batch_size'],
-                                                        num_workers=config['testing']['num_workers'],
-                                                        instance_seg=config['data']['instance_seg'],
-                                                        test=config['testing']['img_only'], has_mask = config['data']['has_mask']
-                                                        )
-
+    # test_loader = cranberry_dataset.build_single_loader(data_dictionary = config['data']['eval_dir'],
+    #                                                     batch_size=config['testing']['batch_size'],
+    #                                                     num_workers=config['testing']['num_workers'],
+    #                                                     instance_seg=config['data']['instance_seg'],
+    #                                                     test=config['testing']['img_only'], has_mask = config['data']['has_mask']
+    #                                                     )
+    
+    test_transform = torchvision.transforms.Compose([
+                    torchvision.transforms.ToTensor(),
+                    # torchvision.transforms.Normalize(*mean_std)
+                    ])
+    
+    test_loader = build_dataset(dataset_name='craid', 
+                                root=config['data']['eval_dir'], 
+                                batch_size=config['testing']['batch_size'],
+                                num_workers=config['testing']['num_workers'], 
+                                split="test", 
+                                transforms=test_transform)
 
     with peter('Building Network'):
         model = unet_refined.UNetRefined(n_channels=3,n_classes=2)
@@ -227,7 +251,7 @@ if __name__ == "__main__":
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,len(test_loader),eta_min = config['testing']['learning_rate'])
     start_epoch = 0
     lowest_mahd = np.infty
-    model_paths = utils.dictionary_contents(config['data']['models_lists_dir'],types=["*.pth"])
+    model_paths = config['data']['model_name']
     for model_path in model_paths:
         #TODO: Add resume option to Trainer using below code
         if config['testing']['resume'] != False:
@@ -239,7 +263,7 @@ if __name__ == "__main__":
                     start_epoch = checkpoint['epoch']
                     model.load_state_dict(checkpoint['model'])
                     optimizer.load_state_dict(checkpoint['optimizer'])
-                    scheduler.load_state_dict(checkpoint['scheduler'])
+                    # scheduler.load_state_dict(checkpoint['scheduler'])
                     print(f"loaded model from {config['testing']['resume']}")
                     # print("Loaded checkpoint {}, now at epoch: {}".format(config['training']['resume'],checkpoint['epoch']))        
                 else:
@@ -255,5 +279,5 @@ if __name__ == "__main__":
         # model = torch.load(config['data']['model_name'])
         # model.load_state_dict(checkpoint['model'])
 
-        evalutor = Evaluator(model=model,test_loader = test_loader,criterion=loss_segmentation,has_mask=config['data']['has_mask'])
+        evalutor = Evaluator(model=model,test_loader = test_loader, criterion=loss_segmentation,has_mask=config['data']['has_mask'])
         evalutor.forward(experiment)

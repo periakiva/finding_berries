@@ -152,7 +152,7 @@ class CBDatasetSemanticSeg(Dataset):
         
         count = int(img_path.split("/")[-1].split("_")[1])
         image = np.array(image)
-        mask = np.array(mask)
+        mask = np.array(mask)*255
         # 0 encoding non-damaged is supposed to be 1 for training.
         # In training, 0 is of background
         # mask = Image.open(mask_path)#.convert("L")
@@ -166,7 +166,8 @@ class CBDatasetSemanticSeg(Dataset):
         if self.transforms is not None:
             # collections = list(map(FT.to_pil_image,[image,mask]))
             image = self.transforms(image)
-            mask = FT.to_tensor(mask)
+            mask = FT.to_tensor(mask).long()
+            # print(f"mask min: {mask.min()}, max: {mask.max()}")
             # transformed_img, tranformed_mask = self.transforms(collections)
             return image, mask, count, img_path
             

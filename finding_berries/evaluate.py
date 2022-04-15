@@ -207,7 +207,7 @@ class Evaluator(object):
         with torch.no_grad():
             for batch_index,batch in enumerate(loader):
                 imgs,masks,count,img_path = batch
-
+                
                 imgs = imgs.to(device)
                 masks = masks.to(device).squeeze(1)
                 count = count.to(device)
@@ -263,7 +263,7 @@ class Evaluator(object):
                         count_mape,"detection mae":detection_count_mae,"detection rmse":detection_count_rmse,
                         "detection mape":detection_count_mape}
         # print(type(count_metrics[0]))
-        _,_,mean_iou,_ = eval_utils.calc_mAP(preds,targets)
+        _,_,mean_iou,_ = eval_utils.calc_mAP(preds, targets)
         print("Validation mIoU value: {0:1.5f}".format(mean_iou))
         # print(f"Validation Count Regression Mean Average Error: {count_mae}\nRegression Root Mean Squared Error: {count_rmse}\nRegression Mean Absolute Percent Error: {count_mape}")
         print(f"Detection MAE: {detection_count_mae}\nDetection RMSE: {detection_count_rmse}\n Detection MAPE: {detection_count_mape}")
@@ -301,7 +301,7 @@ if __name__ == "__main__":
     
     test_transform = torchvision.transforms.Compose([
                     torchvision.transforms.ToTensor(),
-                    torchvision.transforms.Normalize(*mean_std)
+                    # torchvision.transforms.Normalize(*mean_std)
                     ])
     
     # data_dictionary,batch_size,num_workers,instance_seg = False):
@@ -332,10 +332,11 @@ if __name__ == "__main__":
     class_weights = torch.Tensor((1,1)).float()
     class_weights = class_weights.to(device)
     loss_segmentation = nn.CrossEntropyLoss(class_weights)
-    # loss_convexity = loss.ConvexShapeLoss(height=456,width=608,device=device)
+
     optimizer = optim.Adam(model.parameters(),
                             lr=config['testing']['learning_rate'],
                             amsgrad=True)
+    
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer,len(test_loader),eta_min = config['testing']['learning_rate'])
     start_epoch = 0
     lowest_mahd = np.infty
@@ -352,12 +353,6 @@ if __name__ == "__main__":
             else:
                 print("no checkpoint found at {}".format(config['testing'][config['location']]['resume']))
                 exit()
-
-
-    
-    class_weights = torch.Tensor((1,1)).float()
-    class_weights = class_weights.to(device)
-    loss_segmentation = nn.CrossEntropyLoss(class_weights)
 
 
     evalutor = Evaluator(model=model,test_loader = test_loader,
