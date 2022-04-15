@@ -52,6 +52,7 @@ class Trainer(object):
         self.optimizer = optimizer
         self.scheduler = scheduler
         self.criterion = criterion
+        self.config = config
         self.save_figures = config['visualization']['save_individual_plots']
         self.visualizer_indicator = config['visualization']['train_visualizer']
         self.class_weights = config['training']['class_weights']
