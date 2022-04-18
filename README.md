@@ -40,7 +40,7 @@ python setup.py develop
 ```
 
 
-#### Evaluation on a fully-supervised datasets
+#### Evaluation on a fully-supervised test dataset
 First edit all parameters in the config file under .configs/segEval.yaml
 
 Then run 
