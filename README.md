@@ -36,6 +36,28 @@ conda create --name finding_berries --file environment.yml
 conda activate finding_berries
 ```
 
+
+#### Evaluation on a fully-supervised datasets
+First edit all parameters in the config file under .configs/segEval.yaml
+Then run 
+```
+python evaluate.py
+```
+
+#### Evaluation on a given images
+
+run
+```
+python forward_pass_on_single_image.py --image_path <path to image>
+```
+
+#### Training from scratch
+First edit all parameters in the config file under .configs/craid.yaml
+Then run
+```
+python train_eval.py
+```
+
 ### Docker
 
 This project can also be ran in a docker container. First install docker and nvidia-docker on your machine ([docker](https://docs.docker.com/get-docker/), [docker-nvidia](https://github.com/NVIDIA/nvidia-docker)). Then:
