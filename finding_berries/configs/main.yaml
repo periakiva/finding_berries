@@ -4,8 +4,8 @@ seed: 128
 
 visualization:
   batch_index_to_show: 0
-  train_visualizer: True
-  val_visualizer: True
+  train_visualizer: False
+  val_visualizer: False
   visualize_training_every: 2
   visualize_val_every: 2
   train_visualization_divisor: 500
