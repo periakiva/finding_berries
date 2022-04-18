@@ -52,7 +52,7 @@ python evaluate.py
 
 run
 ```
-python forward_pass_on_single_image.py --image_path <path to image>
+python forward_pass_on_single_image.py --image_path <path to image or directory> --save <Optional, path to directory to save output, if saving is needed>
 ```
 
 #### Training from scratch

@@ -112,12 +112,33 @@ def load_image(path):
     im = Image.open(path)
     return im
 
-def dictionary_contents(path,types):
+def dictionary_contents(path: str, types: list, recursive: bool =False) -> list:
+    """extyract dictionary and subdictionary contents
+
+    Parameters
+    ----------
+    path : str
+        path of root
+    types : list
+        types of files to be extracted
+    recursive : bool, optional
+        search in subsequent directories, by default False
+
+    Returns
+    -------
+    list
+        list of files with full paths
+    """
     files = []
-    # types = ["*.png","*.jpg","*.PNG","*.JPG"]
+    if recursive:
+        path = path+"/**/*"
     for type in types:
-        for x in glob(path+type):
-            files.append(os.path.join(path,x))
+        if recursive:
+            for x in glob(path+type,recursive=True):
+                files.append(os.path.join(path,x))
+        else:
+            for x in glob(path+type):
+                files.append(os.path.join(path,x))
     return files
 
 def show_image(image):
