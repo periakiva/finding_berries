@@ -13,6 +13,7 @@ from PIL import Image
 from skimage import morphology
 from tqdm import tqdm
 from skimage.segmentation import find_boundaries
+import torchvision.transforms.functional as FT
 
 import matplotlib.pyplot as plt
 from matplotlib import colors
@@ -48,11 +49,14 @@ class SingleEvaluator(object):
         
         with torch.no_grad():
             pbar = tqdm(images, total=len(images))
+            
             for image_path in pbar:
                 image_name = image_path.split('/')[-1].split('.')[0]
                 image = Image.open(image_path).convert("RGB")
                 image = test_transform(image).unsqueeze_(0)
                 image = image.to(device)
+                image = FT.resize(image, (456, 608), interpolation=FT.InterpolationMode.BILINEAR)
+                
                 output, count_estimation = self.model.forward(image)
                 
                 pred = output.max(1)[1].squeeze_(1).squeeze_(0).cpu().numpy()
@@ -123,7 +127,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     
     if os.path.isdir(args.image_path):
-        images = utils.dictionary_contents(args.image_path, types=['*.png', '*.jpg', '*.jpeg'])
+        images = utils.dictionary_contents(args.image_path, types=['*.png', '*.jpg', '*.jpeg', '*.JPG'])
     else:
         images = [args.image_path]
     
